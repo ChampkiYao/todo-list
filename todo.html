@@ -34,367 +34,159 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  .app {
-    width: 100%;
-    max-width: 520px;
-  }
+  .app { width: 100%; max-width: 520px; }
 
   /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 28px;
-  }
+  .header { text-align: center; margin-bottom: 28px; }
   .header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -.5px;
+    font-size: 28px; font-weight: 700; letter-spacing: -.5px;
     background: linear-gradient(135deg, #fff 30%, var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  .header .date-display {
-    margin-top: 6px;
-    font-size: 13px;
-    color: var(--text-secondary);
-  }
+  .header .date-display { margin-top: 6px; font-size: 13px; color: var(--text-secondary); }
 
-  /* Input area */
-  .input-area {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+  /* Input */
+  .input-area { display: flex; gap: 10px; margin-bottom: 20px; }
   .input-area input {
-    flex: 1;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    font-size: 15px;
-    color: var(--text-primary);
-    outline: none;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 14px 18px; font-size: 15px;
+    color: var(--text-primary); outline: none;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     transition: border-color var(--transition);
   }
   .input-area input::placeholder { color: var(--text-secondary); }
   .input-area input:focus { border-color: var(--accent); }
-
   .input-area button {
-    background: var(--accent);
-    border: none;
-    border-radius: var(--radius);
-    padding: 0 22px;
-    font-size: 26px;
-    color: #fff;
-    cursor: pointer;
+    background: var(--accent); border: none; border-radius: var(--radius);
+    padding: 0 22px; font-size: 26px; color: #fff; cursor: pointer;
     transition: background var(--transition), transform var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .input-area button:hover { background: var(--accent-hover); transform: scale(1.05); }
   .input-area button:active { transform: scale(.95); }
 
   /* Task list */
-  .task-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .task-list { display: flex; flex-direction: column; gap: 10px; }
 
   /* Task card */
   .task-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    padding: 12px 14px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 10px;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: var(--radius); padding: 12px 14px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 4px 24px var(--glass-shadow);
     transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition);
-    cursor: default;
-    position: relative;
-    user-select: none;
+    cursor: default; position: relative; user-select: none;
   }
-  .task-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 30px rgba(0,0,0,.45);
-  }
-  .task-card.dragging {
-    opacity: .45;
-    transform: scale(.97);
-  }
-  .task-card.drag-over {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(124,92,252,.35);
-  }
-  .task-card.removing {
-    animation: slideOut .3s ease forwards;
-  }
-  @keyframes slideOut {
-    to { opacity:0; transform: translateX(40px); height:0; padding:0; margin:0; border:0; overflow:hidden; }
-  }
-  .task-card.entering {
-    animation: slideIn .3s ease;
-  }
-  @keyframes slideIn {
-    from { opacity:0; transform: translateY(-8px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
+  .task-card:hover { transform: translateY(-1px); box-shadow: 0 6px 30px rgba(0,0,0,.45); }
+  .task-card.dragging { opacity: .45; transform: scale(.97); }
+  .task-card.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,92,252,.35); }
+  .task-card.removing { animation: slideOut .3s ease forwards; }
+  @keyframes slideOut { to { opacity:0; transform: translateX(40px); height:0; padding:0; margin:0; border:0; overflow:hidden; } }
+  .task-card.entering { animation: slideIn .3s ease; }
+  @keyframes slideIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
 
   /* Checkbox */
-  .task-check {
-    position: relative;
-    width: 22px; height: 22px;
-    flex-shrink: 0;
-  }
-  .task-check input {
-    position: absolute;
-    opacity: 0;
-    width: 100%; height: 100%;
-    cursor: pointer;
-    z-index: 2;
-  }
+  .task-check { position: relative; width: 22px; height: 22px; flex-shrink: 0; }
+  .task-check input { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
   .task-check .checkmark {
-    position: absolute;
-    inset: 0;
-    border: 2px solid rgba(255,255,255,.25);
-    border-radius: 6px;
-    transition: all var(--transition);
+    position: absolute; inset: 0; border: 2px solid rgba(255,255,255,.25);
+    border-radius: 6px; transition: all var(--transition);
   }
-  .task-check input:checked + .checkmark {
-    background: var(--success);
-    border-color: var(--success);
-  }
+  .task-check input:checked + .checkmark { background: var(--success); border-color: var(--success); }
   .task-check input:checked + .checkmark::after {
-    content: '';
-    position: absolute;
-    left: 6px; top: 2px;
-    width: 5px; height: 10px;
-    border: solid #fff;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    content: ''; position: absolute; left: 6px; top: 2px;
+    width: 5px; height: 10px; border: solid #fff;
+    border-width: 0 2px 2px 0; transform: rotate(45deg);
   }
 
   .task-text {
-    flex: 1;
-    font-size: 15px;
-    line-height: 1.45;
-    word-break: break-word;
-    transition: all var(--transition);
-    cursor: default;
+    flex: 1; font-size: 15px; line-height: 1.45;
+    word-break: break-word; transition: all var(--transition); cursor: default;
   }
-  .task-card.done .task-text {
-    text-decoration: line-through;
-    color: var(--text-secondary);
-  }
+  .task-card.done .task-text { text-decoration: line-through; color: var(--text-secondary); }
 
   /* Inline edit */
-  .task-text.editing {
-    cursor: default;
-  }
+  .task-text.editing { cursor: default; }
   .edit-input {
-    width: 100%;
-    background: rgba(255,255,255,.08);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 15px;
-    color: var(--text-primary);
-    outline: none;
-    font-family: inherit;
-    line-height: 1.45;
+    width: 100%; background: rgba(255,255,255,.08); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 6px 10px; font-size: 15px;
+    color: var(--text-primary); outline: none; font-family: inherit; line-height: 1.45;
   }
 
-  /* Action buttons group */
-  .task-actions {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    flex-shrink: 0;
-  }
+  /* Actions */
+  .task-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
   .task-actions button {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 14px;
-    cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 4px;
-    transition: all var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: none; border: none; color: var(--text-secondary);
+    font-size: 14px; cursor: pointer; padding: 4px 6px; border-radius: 4px;
+    transition: all var(--transition); display: flex; align-items: center; justify-content: center;
   }
-  .task-actions button:hover {
-    color: var(--text-primary);
-    background: rgba(255,255,255,.1);
-  }
+  .task-actions button:hover { color: var(--text-primary); background: rgba(255,255,255,.1); }
   .task-actions .btn-pin { font-size: 14px; }
   .task-actions .btn-pin:hover { color: var(--accent-hover); }
   .task-actions .btn-delete:hover { color: var(--danger); background: rgba(255,92,106,.12); }
-  .task-actions button:disabled {
-    opacity: .2;
-    cursor: default;
-  }
-  .task-actions button:disabled:hover {
-    color: var(--text-secondary);
-    background: none;
-  }
+  .task-actions button:disabled { opacity: .2; cursor: default; }
+  .task-actions button:disabled:hover { color: var(--text-secondary); background: none; }
 
   /* Collapse bar */
   .collapse-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 4px;
-    margin-top: 6px;
-    cursor: pointer;
-    color: var(--text-secondary);
-    font-size: 13px;
-    transition: color var(--transition);
-    user-select: none;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 4px; margin-top: 6px; cursor: pointer;
+    color: var(--text-secondary); font-size: 13px;
+    transition: color var(--transition); user-select: none;
   }
   .collapse-bar:hover { color: var(--text-primary); }
-  .collapse-bar .arrow {
-    transition: transform .25s ease;
-    font-size: 10px;
-  }
+  .collapse-bar .arrow { transition: transform .25s ease; font-size: 10px; }
   .collapse-bar.expanded .arrow { transform: rotate(180deg); }
 
-  /* Undo toast */
+  /* Toast */
   .toast-container {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    pointer-events: none;
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 1000; pointer-events: none;
   }
   .toast {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(30,30,40,.92);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 12px;
-    padding: 12px 18px;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px rgba(0,0,0,.5);
-    color: var(--text-primary);
-    font-size: 14px;
-    pointer-events: auto;
-    animation: toastIn .3s ease;
-    white-space: nowrap;
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(30,30,40,.92); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px; padding: 12px 18px;
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0,0,0,.5); color: var(--text-primary);
+    font-size: 14px; pointer-events: auto; animation: toastIn .3s ease; white-space: nowrap;
   }
-  .toast.hiding {
-    animation: toastOut .3s ease forwards;
-  }
+  .toast.hiding { animation: toastOut .3s ease forwards; }
   .toast-undo {
-    background: var(--accent);
-    border: none;
-    border-radius: 8px;
-    padding: 5px 14px;
-    font-size: 13px;
-    color: #fff;
-    cursor: pointer;
-    transition: background var(--transition);
-    font-weight: 600;
+    background: var(--accent); border: none; border-radius: 8px;
+    padding: 5px 14px; font-size: 13px; color: #fff; cursor: pointer;
+    transition: background var(--transition); font-weight: 600;
   }
   .toast-undo:hover { background: var(--accent-hover); }
-  @keyframes toastIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes toastOut {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(16px); }
-  }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(16px); } }
 
   /* Stats */
-  .stats {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 13px;
-    color: var(--text-secondary);
+  .stats { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-secondary); }
+
+  /* Storage mode indicator */
+  .storage-mode {
+    text-align: center; margin-top: 8px; font-size: 11px; color: var(--text-secondary); opacity: .5;
   }
 
-  /* Empty state */
-  .empty {
-    text-align: center;
-    padding: 60px 0;
-    color: var(--text-secondary);
-    font-size: 15px;
-  }
-  .empty .empty-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-    opacity: .5;
+  /* Empty */
+  .empty { text-align: center; padding: 60px 0; color: var(--text-secondary); font-size: 15px; }
+  .empty .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+
+  /* Preset tag */
+  .preset-tag {
+    font-size: 10px; background: rgba(124,92,252,.25); color: var(--accent-hover);
+    padding: 1px 6px; border-radius: 8px; margin-left: 6px;
+    vertical-align: middle; white-space: nowrap;
   }
 
-  /* Mobile tweaks */
   @media (max-width: 480px) {
     body { padding: 16px 10px 80px; }
     .input-area input { padding: 12px 14px; font-size: 14px; }
     .task-card { padding: 10px 12px; }
     .task-actions button { padding: 4px 8px; font-size: 13px; }
   }
-
-  /* Preset tag */
-  .preset-tag {
-    font-size: 10px;
-    background: rgba(124,92,252,.25);
-    color: var(--accent-hover);
-    padding: 1px 6px;
-    border-radius: 8px;
-    margin-left: 6px;
-    vertical-align: middle;
-    white-space: nowrap;
-  }
-
-  /* Backup bar */
-  .backup-bar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 16px;
-    padding: 10px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  .backup-bar button {
-    background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all var(--transition);
-  }
-  .backup-bar button:hover {
-    color: var(--text-primary);
-    background: rgba(255,255,255,.12);
-    border-color: rgba(255,255,255,.2);
-  }
-  .backup-bar .backup-status {
-    font-size: 11px;
-    color: var(--text-secondary);
-    opacity: .7;
-  }
-
-  /* Hidden file input */
-  #importInput { display: none; }
 </style>
 </head>
 <body>
@@ -415,12 +207,7 @@
     <span class="arrow">&#9660;</span>
   </div>
   <div class="stats" id="stats"></div>
-  <div class="backup-bar">
-    <button id="exportBtn" title="Download backup JSON">&#8615; Export</button>
-    <button id="importBtn" title="Restore from backup JSON">&#8613; Import</button>
-    <input type="file" id="importInput" accept=".json">
-    <span class="backup-status" id="backupStatus"></span>
-  </div>
+  <div class="storage-mode" id="storageMode"></div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
@@ -429,13 +216,16 @@
 (function() {
   'use strict';
 
-  // ── Storage keys ──
+  // ══════════════════════════════════════════
+  //  Config
+  // ══════════════════════════════════════════
+
+  var API_BASE = '/api/data';
   var STORAGE_KEY_TASKS    = 'todo_tasks';
   var STORAGE_KEY_DATE     = 'todo_date';
   var STORAGE_KEY_ORDER    = 'todo_order';
   var STORAGE_KEY_COLLAPSE = 'todo_collapse';
 
-  // ── Preset tasks (re-added each new day) ──
   var PRESET_TASKS = [
     'Review today\'s schedule',
     'Stay hydrated — drink water',
@@ -444,7 +234,10 @@
     'Reflect & plan tomorrow before bed'
   ];
 
-  // ── DOM refs ──
+  // ══════════════════════════════════════════
+  //  DOM refs
+  // ══════════════════════════════════════════
+
   var taskInput      = document.getElementById('taskInput');
   var addBtn         = document.getElementById('addBtn');
   var taskListEl     = document.getElementById('taskList');
@@ -453,109 +246,117 @@
   var collapseBar    = document.getElementById('collapseBar');
   var collapseLabel  = document.getElementById('collapseLabel');
   var toastContainer = document.getElementById('toastContainer');
-  var exportBtn      = document.getElementById('exportBtn');
-  var importBtn      = document.getElementById('importBtn');
-  var importInput    = document.getElementById('importInput');
-  var backupStatus   = document.getElementById('backupStatus');
+  var storageModeEl  = document.getElementById('storageMode');
 
-  // ── Undo state ──
-  var undoTimer     = null;
+  // ══════════════════════════════════════════
+  //  State
+  // ══════════════════════════════════════════
+
+  var useServer   = false;  // true = server JSON file, false = localStorage
+  var collapsed   = loadCollapse();
+  var undoTimer   = null;
   var pendingDelete = null;
+  var _idCounter  = Date.now();
+  var serverData  = null;   // in-memory copy when using server mode
 
-  // ── Import guard (skip auto-backup during import) ──
-  var importing = false;
-
-  // ── Collapse state ──
-  var collapsed = loadCollapse();
+  function uid() { return 't_' + (++_idCounter); }
 
   // ══════════════════════════════════════════
-  //  Auto-backup & Export/Import
+  //  Server API (fetch / POST)
   // ══════════════════════════════════════════
 
-  var BACKUP_THROTTLE_MS = 3000; // min interval between auto-downloads
-  var lastBackupTime = 0;
-  var backupDebounce = null;
-
-  function buildBackupPayload() {
-    return {
-      version: 1,
-      exportedAt: new Date().toISOString(),
-      tasks: loadTasks(),
-      order: loadOrder(),
-      date: loadSavedDate(),
-      collapse: collapsed
-    };
+  function serverLoad() {
+    return fetch(API_BASE)
+      .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(data) {
+        serverData = data;
+        useServer = true;
+        storageModeEl.textContent = 'Synced to todo-data.json';
+      })
+      .catch(function() {
+        useServer = false;
+        serverData = null;
+        storageModeEl.textContent = 'Local mode (localStorage)';
+      });
   }
 
-  function downloadJSON(filename, data) {
-    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  function serverSave() {
+    if (!useServer || !serverData) return Promise.resolve();
+    return fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(serverData)
+    }).catch(function() {
+      // Silently fail — data stays in memory, will retry on next change
+    });
   }
-
-  function scheduleAutoBackup() {
-    if (backupDebounce) clearTimeout(backupDebounce);
-    backupDebounce = setTimeout(function() {
-      var now = Date.now();
-      if (now - lastBackupTime < BACKUP_THROTTLE_MS) return;
-      lastBackupTime = now;
-      var ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-      downloadJSON('todo-backup-' + ts + '.json', buildBackupPayload());
-      backupStatus.textContent = 'Auto-backed up at ' + new Date().toLocaleTimeString();
-    }, 500);
-  }
-
-  function exportTasks() {
-    var ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    downloadJSON('todo-backup-' + ts + '.json', buildBackupPayload());
-    backupStatus.textContent = 'Exported at ' + new Date().toLocaleTimeString();
-  }
-
-  function importTasks(file) {
-    importing = true;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        var data = JSON.parse(e.target.result);
-        if (!data.tasks || !Array.isArray(data.tasks)) {
-          alert('Invalid backup file: missing tasks array.');
-          importing = false;
-          return;
-        }
-        saveTasks(data.tasks);
-        if (data.order) saveOrder(data.order);
-        if (data.date) saveDate(data.date);
-        if (typeof data.collapse === 'boolean') {
-          collapsed = data.collapse;
-          saveCollapse(collapsed);
-        }
-        backupStatus.textContent = 'Imported ' + data.tasks.length + ' tasks at ' + new Date().toLocaleTimeString();
-        render();
-      } catch (err) {
-        alert('Failed to parse backup file: ' + err.message);
-      }
-      importing = false;
-    };
-    reader.readAsText(file);
-  }
-
-  exportBtn.addEventListener('click', exportTasks);
-  importBtn.addEventListener('click', function() { importInput.click(); });
-  importInput.addEventListener('change', function() {
-    if (importInput.files.length > 0) {
-      importTasks(importInput.files[0]);
-      importInput.value = '';
-    }
-  });
 
   // ══════════════════════════════════════════
-  //  Helpers
+  //  Unified storage layer
+  // ══════════════════════════════════════════
+
+  function getTasks() {
+    if (useServer && serverData) return serverData.tasks || [];
+    return loadTasks();
+  }
+
+  function setTasks(tasks) {
+    if (useServer && serverData) { serverData.tasks = tasks; serverSave(); return; }
+    saveTasks(tasks);
+  }
+
+  function getOrder() {
+    if (useServer && serverData) return serverData.order || null;
+    return loadOrder();
+  }
+
+  function setOrder(order) {
+    if (useServer && serverData) { serverData.order = order; serverSave(); return; }
+    saveOrder(order);
+  }
+
+  function getDate() {
+    if (useServer && serverData) return serverData.date || null;
+    return loadSavedDate();
+  }
+
+  function setDate(d) {
+    if (useServer && serverData) { serverData.date = d; serverSave(); return; }
+    saveDate(d);
+  }
+
+  // Collapse is always localStorage (cosmetic only)
+  function loadCollapse() {
+    return localStorage.getItem(STORAGE_KEY_COLLAPSE) === '1';
+  }
+  function saveCollapse(v) {
+    localStorage.setItem(STORAGE_KEY_COLLAPSE, v ? '1' : '0');
+  }
+
+  // localStorage helpers (fallback mode)
+  function loadTasks() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || []; }
+    catch (e) { return []; }
+  }
+  function saveTasks(tasks) {
+    localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+  }
+  function loadOrder() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_ORDER)); }
+    catch (e) { return null; }
+  }
+  function saveOrder(order) {
+    localStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
+  }
+  function loadSavedDate() {
+    return localStorage.getItem(STORAGE_KEY_DATE);
+  }
+  function saveDate(d) {
+    localStorage.setItem(STORAGE_KEY_DATE, d);
+  }
+
+  // ══════════════════════════════════════════
+  //  Daily reset
   // ══════════════════════════════════════════
 
   function todayKey() {
@@ -565,74 +366,14 @@
       String(d.getDate()).padStart(2, '0');
   }
 
-  function loadTasks() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || []; }
-    catch (e) { return []; }
-  }
-
-  function saveTasks(tasks) {
-    localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
-    if (!importing) scheduleAutoBackup();
-  }
-
-  function loadOrder() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_ORDER)); }
-    catch (e) { return null; }
-  }
-
-  function saveOrder(order) {
-    localStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
-  }
-
-  function loadSavedDate() {
-    return localStorage.getItem(STORAGE_KEY_DATE);
-  }
-
-  function saveDate(d) {
-    localStorage.setItem(STORAGE_KEY_DATE, d);
-  }
-
-  function loadCollapse() {
-    return localStorage.getItem(STORAGE_KEY_COLLAPSE) === '1';
-  }
-
-  function saveCollapse(v) {
-    localStorage.setItem(STORAGE_KEY_COLLAPSE, v ? '1' : '0');
-  }
-
-  var _idCounter = Date.now();
-  function uid() { return 't_' + (++_idCounter); }
-
-  // Get tasks sorted by saved order
-  function getOrderedTasks() {
-    var tasks = loadTasks();
-    var savedOrder = loadOrder();
-    if (savedOrder) {
-      var orderMap = {};
-      savedOrder.forEach(function(id, i) { orderMap[id] = i; });
-      tasks.sort(function(a, b) {
-        var ia = orderMap[a.id] !== undefined ? orderMap[a.id] : 999999;
-        var ib = orderMap[b.id] !== undefined ? orderMap[b.id] : 999999;
-        return ia - ib;
-      });
-    }
-    return tasks;
-  }
-
-  // ══════════════════════════════════════════
-  //  Daily reset
-  // ══════════════════════════════════════════
-
   function dailyReset() {
-    var today  = todayKey();
-    var saved  = loadSavedDate();
-    var tasks  = loadTasks();
+    var today = todayKey();
+    var saved = getDate();
+    var tasks = getTasks();
 
     if (saved !== today) {
-      // Uncheck all tasks
       tasks.forEach(function(t) { t.done = false; });
 
-      // Append presets that don't already exist
       var existingTexts = {};
       tasks.forEach(function(t) { existingTexts[t.text.toLowerCase()] = true; });
 
@@ -643,10 +384,29 @@
         });
 
       tasks = tasks.concat(newPresets);
-      saveTasks(tasks);
-      saveDate(today);
+      setTasks(tasks);
+      setDate(today);
     }
 
+    return tasks;
+  }
+
+  // ══════════════════════════════════════════
+  //  Ordered tasks
+  // ══════════════════════════════════════════
+
+  function getOrderedTasks() {
+    var tasks = getTasks();
+    var savedOrder = getOrder();
+    if (savedOrder) {
+      var orderMap = {};
+      savedOrder.forEach(function(id, i) { orderMap[id] = i; });
+      tasks.sort(function(a, b) {
+        var ia = orderMap[a.id] !== undefined ? orderMap[a.id] : 999999;
+        var ib = orderMap[b.id] !== undefined ? orderMap[b.id] : 999999;
+        return ia - ib;
+      });
+    }
     return tasks;
   }
 
@@ -681,15 +441,13 @@
   function dismissToast(el) {
     if (!el || !el.parentNode) return;
     el.classList.add('hiding');
-    setTimeout(function() {
-      if (el.parentNode) el.parentNode.removeChild(el);
-    }, 300);
+    setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
     undoTimer = null;
     pendingDelete = null;
   }
 
   // ══════════════════════════════════════════
-  //  Collapse toggle
+  //  Collapse
   // ══════════════════════════════════════════
 
   function updateCollapseBar(tasks) {
@@ -713,9 +471,7 @@
 
   function render() {
     var tasks = dailyReset();
-
-    // Re-read collapsed since dailyReset may have changed tasks
-    var savedOrder = loadOrder();
+    var savedOrder = getOrder();
     if (savedOrder) {
       var orderMap = {};
       savedOrder.forEach(function(id, i) { orderMap[id] = i; });
@@ -737,12 +493,8 @@
 
     updateCollapseBar(tasks);
 
-    var visibleCount = 0;
-
     tasks.forEach(function(task) {
-      // Skip done tasks when collapsed
       if (collapsed && task.done) return;
-      visibleCount++;
 
       var card = document.createElement('div');
       card.className = 'task-card' + (task.done ? ' done' : '');
@@ -763,7 +515,7 @@
       checkDiv.appendChild(cb);
       checkDiv.appendChild(mark);
 
-      // Text (double-click to edit)
+      // Text
       var textSpan = document.createElement('span');
       textSpan.className = 'task-text';
       textSpan.textContent = task.text;
@@ -774,58 +526,40 @@
         textSpan.appendChild(tag);
       }
       textSpan.addEventListener('dblclick', (function(id, ts, c) {
-        return function(e) {
-          e.stopPropagation();
-          startEdit(id, ts, c);
-        };
+        return function(e) { e.stopPropagation(); startEdit(id, ts, c); };
       })(task.id, textSpan, card));
 
-      // Actions group
+      // Actions
       var actions = document.createElement('div');
       actions.className = 'task-actions';
 
-      // Pin to top
       var pinTop = document.createElement('button');
       pinTop.className = 'btn-pin';
       pinTop.innerHTML = '&#8673;';
       pinTop.title = 'Pin to top';
-      pinTop.addEventListener('click', (function(id) {
-        return function() { pinTask(id, 'top'); };
-      })(task.id));
+      pinTop.addEventListener('click', (function(id) { return function() { pinTask(id, 'top'); }; })(task.id));
 
-      // Pin to bottom
       var pinBot = document.createElement('button');
       pinBot.className = 'btn-pin';
       pinBot.innerHTML = '&#8675;';
       pinBot.title = 'Pin to bottom';
-      pinBot.addEventListener('click', (function(id) {
-        return function() { pinTask(id, 'bottom'); };
-      })(task.id));
+      pinBot.addEventListener('click', (function(id) { return function() { pinTask(id, 'bottom'); }; })(task.id));
 
-      // Move up
       var upBtn = document.createElement('button');
       upBtn.innerHTML = '&#9650;';
       upBtn.title = 'Move up';
-      upBtn.addEventListener('click', (function(id) {
-        return function() { moveTask(id, -1); };
-      })(task.id));
+      upBtn.addEventListener('click', (function(id) { return function() { moveTask(id, -1); }; })(task.id));
 
-      // Move down
       var downBtn = document.createElement('button');
       downBtn.innerHTML = '&#9660;';
       downBtn.title = 'Move down';
-      downBtn.addEventListener('click', (function(id) {
-        return function() { moveTask(id, 1); };
-      })(task.id));
+      downBtn.addEventListener('click', (function(id) { return function() { moveTask(id, 1); }; })(task.id));
 
-      // Delete
       var delBtn = document.createElement('button');
       delBtn.className = 'btn-delete';
       delBtn.innerHTML = '&#10005;';
       delBtn.title = 'Delete task';
-      delBtn.addEventListener('click', (function(id) {
-        return function() { deleteTask(id); };
-      })(task.id));
+      delBtn.addEventListener('click', (function(id) { return function() { deleteTask(id); }; })(task.id));
 
       actions.appendChild(pinTop);
       actions.appendChild(pinBot);
@@ -837,7 +571,7 @@
       card.appendChild(textSpan);
       card.appendChild(actions);
 
-      // Drag events (desktop)
+      // Drag (desktop)
       card.addEventListener('dragstart', onDragStart);
       card.addEventListener('dragend', onDragEnd);
       card.addEventListener('dragover', onDragOver);
@@ -854,7 +588,7 @@
         };
       })(touchState, card), { passive: true });
 
-      card.addEventListener('touchmove', (function(ts, el) {
+      card.addEventListener('touchmove', (function(ts) {
         return function(e) {
           if (!ts.card) return;
           e.preventDefault();
@@ -864,22 +598,15 @@
           if (overCard && overCard !== ts.card) {
             var overRect = overCard.getBoundingClientRect();
             var overMid = overRect.top + overRect.height / 2;
-            if (touchY < overMid) {
-              taskListEl.insertBefore(ts.card, overCard);
-            } else {
-              taskListEl.insertBefore(ts.card, overCard.nextSibling);
-            }
+            if (touchY < overMid) taskListEl.insertBefore(ts.card, overCard);
+            else taskListEl.insertBefore(ts.card, overCard.nextSibling);
           }
         };
-      })(touchState, card), { passive: false });
+      })(touchState), { passive: false });
 
       card.addEventListener('touchend', (function(ts) {
         return function() {
-          if (ts.card) {
-            ts.card = null;
-            persistCurrentOrder();
-            render();
-          }
+          if (ts.card) { ts.card = null; persistCurrentOrder(); render(); }
         };
       })(touchState), { passive: true });
 
@@ -891,12 +618,12 @@
   }
 
   // ══════════════════════════════════════════
-  //  Inline edit (double-click)
+  //  Inline edit
   // ══════════════════════════════════════════
 
   function startEdit(id, textSpan, card) {
     if (textSpan.querySelector('.edit-input')) return;
-    var tasks = loadTasks();
+    var tasks = getTasks();
     var task = null;
     for (var i = 0; i < tasks.length; i++) {
       if (tasks[i].id === id) { task = tasks[i]; break; }
@@ -916,22 +643,17 @@
     input.select();
 
     var committed = false;
-
     function commit() {
       if (committed) return;
       committed = true;
       var val = input.value.trim();
       if (val && val !== task.text) {
         task.text = val;
-        saveTasks(tasks);
+        setTasks(tasks);
       }
       render();
     }
-
-    function cancel() {
-      committed = true;
-      render();
-    }
+    function cancel() { committed = true; render(); }
 
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') { e.preventDefault(); commit(); }
@@ -947,69 +669,60 @@
   function addTask(text) {
     text = text.trim();
     if (!text) return;
-    var tasks = loadTasks();
+    var tasks = getTasks();
     var task = { id: uid(), text: text, done: false, preset: false, created: Date.now() };
     tasks.push(task);
-    saveTasks(tasks);
-    var order = loadOrder() || tasks.map(function(t) { return t.id; });
+    setTasks(tasks);
+    var order = getOrder() || tasks.map(function(t) { return t.id; });
     order.push(task.id);
-    saveOrder(order);
+    setOrder(order);
     render();
   }
 
   function toggleTask(id) {
-    var tasks = loadTasks();
+    var tasks = getTasks();
     for (var i = 0; i < tasks.length; i++) {
       if (tasks[i].id === id) { tasks[i].done = !tasks[i].done; break; }
     }
-    saveTasks(tasks);
+    setTasks(tasks);
     render();
   }
 
   function deleteTask(id) {
-    var tasks = loadTasks();
+    var tasks = getTasks();
     var task = null;
     var idx = -1;
     for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === id) {
-        task = tasks[i];
-        idx = i;
-        break;
-      }
+      if (tasks[i].id === id) { task = tasks[i]; idx = i; break; }
     }
     if (!task) return;
 
-    var order = loadOrder();
+    var order = getOrder();
     var orderIdx = order ? order.indexOf(id) : -1;
-
-    // Store for undo
     pendingDelete = { task: JSON.parse(JSON.stringify(task)), index: idx, orderIndex: orderIdx };
 
-    // Animate out
     var card = taskListEl.querySelector('[data-id="' + id + '"]');
     if (card) card.classList.add('removing');
 
-    // Remove from data
     var newTasks = [];
     for (var j = 0; j < tasks.length; j++) {
       if (tasks[j].id !== id) newTasks.push(tasks[j]);
     }
-    saveTasks(newTasks);
+    setTasks(newTasks);
 
     if (order) {
       var newOrder = order.filter(function(oid) { return oid !== id; });
-      saveOrder(newOrder);
+      setOrder(newOrder);
     }
 
     showToast('Task deleted', function() {
       if (!pendingDelete) return;
-      // Restore task at original position
-      var restored = loadTasks();
+      var restored = getTasks();
       var insertAt = Math.min(pendingDelete.index, restored.length);
       restored.splice(insertAt, 0, pendingDelete.task);
-      saveTasks(restored);
+      setTasks(restored);
 
-      var restoredOrder = loadOrder() || restored.map(function(t) { return t.id; });
+      var restoredOrder = getOrder() || restored.map(function(t) { return t.id; });
       var orderInsertAt = Math.min(
         pendingDelete.orderIndex >= 0 ? pendingDelete.orderIndex : restoredOrder.length,
         restoredOrder.length
@@ -1017,7 +730,7 @@
       if (pendingDelete.orderIndex >= 0) {
         restoredOrder.splice(orderInsertAt, 0, pendingDelete.task.id);
       }
-      saveOrder(restoredOrder);
+      setOrder(restoredOrder);
       pendingDelete = null;
       render();
     });
@@ -1039,8 +752,8 @@
     tasks[idx] = tasks[newIdx];
     tasks[newIdx] = temp;
 
-    saveTasks(tasks);
-    saveOrder(tasks.map(function(t) { return t.id; }));
+    setTasks(tasks);
+    setOrder(tasks.map(function(t) { return t.id; }));
     render();
   }
 
@@ -1053,77 +766,48 @@
     if (idx === -1) return;
 
     var task = tasks.splice(idx, 1)[0];
-    if (where === 'top') {
-      tasks.unshift(task);
-    } else {
-      tasks.push(task);
-    }
+    if (where === 'top') tasks.unshift(task);
+    else tasks.push(task);
 
-    saveTasks(tasks);
-    saveOrder(tasks.map(function(t) { return t.id; }));
+    setTasks(tasks);
+    setOrder(tasks.map(function(t) { return t.id; }));
     render();
-  }
-
-  // ══════════════════════════════════════════
-  //  Persist DOM order after drag
-  // ══════════════════════════════════════════
-
-  function persistCurrentOrder() {
-    var cards = taskListEl.querySelectorAll('.task-card');
-    var order = [];
-    for (var i = 0; i < cards.length; i++) {
-      order.push(cards[i].dataset.id);
-    }
-    saveOrder(order);
   }
 
   // ══════════════════════════════════════════
   //  Drag & Drop
   // ══════════════════════════════════════════
 
-  var dragSrcEl = null;
+  function persistCurrentOrder() {
+    var cards = taskListEl.querySelectorAll('.task-card');
+    var order = [];
+    for (var i = 0; i < cards.length; i++) order.push(cards[i].dataset.id);
+    setOrder(order);
+  }
 
+  var dragSrcEl = null;
   function onDragStart(e) {
     dragSrcEl = this;
     this.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', this.dataset.id);
   }
-
   function onDragEnd() {
     this.classList.remove('dragging');
     var cards = taskListEl.querySelectorAll('.task-card');
-    for (var i = 0; i < cards.length; i++) {
-      cards[i].classList.remove('drag-over');
-    }
+    for (var i = 0; i < cards.length; i++) cards[i].classList.remove('drag-over');
   }
-
-  function onDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }
-
-  function onDragEnter(e) {
-    e.preventDefault();
-    if (this !== dragSrcEl) this.classList.add('drag-over');
-  }
-
-  function onDragLeave() {
-    this.classList.remove('drag-over');
-  }
-
+  function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+  function onDragEnter(e) { e.preventDefault(); if (this !== dragSrcEl) this.classList.add('drag-over'); }
+  function onDragLeave() { this.classList.remove('drag-over'); }
   function onDrop(e) {
-    e.stopPropagation();
-    e.preventDefault();
+    e.stopPropagation(); e.preventDefault();
     if (dragSrcEl !== this) {
       var allCards = Array.prototype.slice.call(taskListEl.querySelectorAll('.task-card'));
       var fromIdx = allCards.indexOf(dragSrcEl);
       var toIdx   = allCards.indexOf(this);
-      if (fromIdx < toIdx) {
-        taskListEl.insertBefore(dragSrcEl, this.nextSibling);
-      } else {
-        taskListEl.insertBefore(dragSrcEl, this);
-      }
+      if (fromIdx < toIdx) taskListEl.insertBefore(dragSrcEl, this.nextSibling);
+      else taskListEl.insertBefore(dragSrcEl, this);
       persistCurrentOrder();
       render();
     }
@@ -1151,10 +835,7 @@
   });
 
   taskInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      addTask(taskInput.value);
-      taskInput.value = '';
-    }
+    if (e.key === 'Enter') { addTask(taskInput.value); taskInput.value = ''; }
   });
 
   // ══════════════════════════════════════════
@@ -1162,7 +843,9 @@
   // ══════════════════════════════════════════
 
   showDate();
-  render();
+  serverLoad().then(function() {
+    render();
+  });
 
 })();
 </script>

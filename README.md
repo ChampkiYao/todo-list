@@ -1,6 +1,16 @@
 # Todo List
 
-A minimalist single-file HTML todo app with frosted glass UI. No build tools, no dependencies — just open the file.
+A minimalist single-file HTML todo app with frosted glass UI. Data saves to a local JSON file via a tiny Node.js server.
+
+## Quick Start
+
+```bash
+node server.js
+```
+
+Open **http://localhost:3000** in your browser. Done.
+
+All tasks, order, and daily state persist in `todo-data.json` next to the HTML file.
 
 ## Features
 
@@ -10,30 +20,24 @@ A minimalist single-file HTML todo app with frosted glass UI. No build tools, no
 - **Daily auto-reset** — checkmarks clear at midnight, preset habits reappear
 - **Collapse completed** — hide finished tasks with one click
 - **Undo delete** — 3-second toast to recover accidentally deleted tasks
-- **Auto-backup** — JSON backup downloads automatically on every data change (throttled to 3s)
-- **Export/Import** — manual backup & restore via JSON files
-- **Persistent storage** — all data saved to `localStorage`, survives refresh
+- **File-based storage** — `todo-data.json` sits next to the HTML, readable & editable
 - **Mobile-friendly** — responsive design with touch drag support
 
-## Usage
+## How It Works
 
-Open `todo.html` in any modern browser. That's it.
+| Mode | Trigger | Storage |
+|---|---|---|
+| **Server mode** | `node server.js` | `todo-data.json` (auto read/write) |
+| **Standalone** | Open `todo.html` directly | `localStorage` (browser only) |
+
+The HTML auto-detects whether the server API is available and switches storage accordingly.
 
 ## Tech
 
-- Single HTML file (~700 lines)
-- Pure HTML / CSS / JS — zero external dependencies
+- Single HTML file, zero external dependencies
 - Frosted glass UI with CSS `backdrop-filter`
-- `localStorage` for persistence
-- Auto-backup to JSON on every change
-
-## Backup & Restore
-
-- **Auto-backup**: A JSON file downloads automatically whenever tasks change (throttled to every 3 seconds max)
-- **Export**: Click "Export" to download a full backup manually
-- **Import**: Click "Import" and select a previously exported JSON file to restore all tasks, order, and settings
-
-Backup files are named `todo-backup-YYYY-MM-DDTHH-MM-SS.json` and contain all tasks, sort order, date state, and collapse preference.
+- `server.js` — 60 lines, Node.js built-in modules only (`http`, `fs`, `path`)
+- `todo-data.json` — human-readable JSON, easy to edit or version control
 
 ## Preset Tasks
 
