@@ -357,6 +357,44 @@
     vertical-align: middle;
     white-space: nowrap;
   }
+
+  /* Backup bar */
+  .backup-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .backup-bar button {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .backup-bar button:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,.12);
+    border-color: rgba(255,255,255,.2);
+  }
+  .backup-bar .backup-status {
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: .7;
+  }
+
+  /* Hidden file input */
+  #importInput { display: none; }
 </style>
 </head>
 <body>
@@ -377,6 +415,12 @@
     <span class="arrow">&#9660;</span>
   </div>
   <div class="stats" id="stats"></div>
+  <div class="backup-bar">
+    <button id="exportBtn" title="Download backup JSON">&#8615; Export</button>
+    <button id="importBtn" title="Restore from backup JSON">&#8613; Import</button>
+    <input type="file" id="importInput" accept=".json">
+    <span class="backup-status" id="backupStatus"></span>
+  </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
@@ -409,13 +453,106 @@
   var collapseBar    = document.getElementById('collapseBar');
   var collapseLabel  = document.getElementById('collapseLabel');
   var toastContainer = document.getElementById('toastContainer');
+  var exportBtn      = document.getElementById('exportBtn');
+  var importBtn      = document.getElementById('importBtn');
+  var importInput    = document.getElementById('importInput');
+  var backupStatus   = document.getElementById('backupStatus');
 
   // ── Undo state ──
   var undoTimer     = null;
   var pendingDelete = null;
 
+  // ── Import guard (skip auto-backup during import) ──
+  var importing = false;
+
   // ── Collapse state ──
   var collapsed = loadCollapse();
+
+  // ══════════════════════════════════════════
+  //  Auto-backup & Export/Import
+  // ══════════════════════════════════════════
+
+  var BACKUP_THROTTLE_MS = 3000; // min interval between auto-downloads
+  var lastBackupTime = 0;
+  var backupDebounce = null;
+
+  function buildBackupPayload() {
+    return {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      tasks: loadTasks(),
+      order: loadOrder(),
+      date: loadSavedDate(),
+      collapse: collapsed
+    };
+  }
+
+  function downloadJSON(filename, data) {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function scheduleAutoBackup() {
+    if (backupDebounce) clearTimeout(backupDebounce);
+    backupDebounce = setTimeout(function() {
+      var now = Date.now();
+      if (now - lastBackupTime < BACKUP_THROTTLE_MS) return;
+      lastBackupTime = now;
+      var ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      downloadJSON('todo-backup-' + ts + '.json', buildBackupPayload());
+      backupStatus.textContent = 'Auto-backed up at ' + new Date().toLocaleTimeString();
+    }, 500);
+  }
+
+  function exportTasks() {
+    var ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    downloadJSON('todo-backup-' + ts + '.json', buildBackupPayload());
+    backupStatus.textContent = 'Exported at ' + new Date().toLocaleTimeString();
+  }
+
+  function importTasks(file) {
+    importing = true;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var data = JSON.parse(e.target.result);
+        if (!data.tasks || !Array.isArray(data.tasks)) {
+          alert('Invalid backup file: missing tasks array.');
+          importing = false;
+          return;
+        }
+        saveTasks(data.tasks);
+        if (data.order) saveOrder(data.order);
+        if (data.date) saveDate(data.date);
+        if (typeof data.collapse === 'boolean') {
+          collapsed = data.collapse;
+          saveCollapse(collapsed);
+        }
+        backupStatus.textContent = 'Imported ' + data.tasks.length + ' tasks at ' + new Date().toLocaleTimeString();
+        render();
+      } catch (err) {
+        alert('Failed to parse backup file: ' + err.message);
+      }
+      importing = false;
+    };
+    reader.readAsText(file);
+  }
+
+  exportBtn.addEventListener('click', exportTasks);
+  importBtn.addEventListener('click', function() { importInput.click(); });
+  importInput.addEventListener('change', function() {
+    if (importInput.files.length > 0) {
+      importTasks(importInput.files[0]);
+      importInput.value = '';
+    }
+  });
 
   // ══════════════════════════════════════════
   //  Helpers
@@ -435,6 +572,7 @@
 
   function saveTasks(tasks) {
     localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+    if (!importing) scheduleAutoBackup();
   }
 
   function loadOrder() {
