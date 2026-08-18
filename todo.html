@@ -67,10 +67,8 @@
   .input-row .btn-add:hover { background: var(--accent-hover); transform: scale(1.05); }
   .input-row .btn-add:active { transform: scale(.95); }
 
-  /* Options row: frequency + priority */
-  .options-row {
-    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
-  }
+  /* Options row */
+  .options-row { display: flex; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; align-items: center; }
   .opt-group { display: flex; gap: 4px; align-items: center; }
   .opt-group-label { font-size: 11px; color: var(--text-secondary); margin-right: 2px; }
   .opt-btn {
@@ -83,6 +81,26 @@
   .opt-btn.p-red.active { border-color: var(--red); background: rgba(255,92,106,.25); color: var(--red); }
   .opt-btn.p-yellow.active { border-color: var(--yellow); background: rgba(251,191,36,.25); color: var(--yellow); }
   .opt-btn.p-green.active { border-color: var(--green); background: rgba(52,211,153,.25); color: var(--green); }
+
+  /* Reset day selector */
+  .day-row {
+    display: none; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; align-items: center;
+  }
+  .day-row.visible { display: flex; }
+  .day-row .day-label { font-size: 11px; color: var(--text-secondary); margin-right: 2px; }
+  .day-btn {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px; padding: 3px 8px; font-size: 12px;
+    color: var(--text-secondary); cursor: pointer; transition: all var(--transition);
+  }
+  .day-btn:hover { color: var(--text-primary); border-color: rgba(255,255,255,.25); }
+  .day-btn.active { color: #fff; border-color: var(--accent); background: rgba(124,92,252,.25); }
+  .day-select {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px; padding: 3px 6px; font-size: 12px;
+    color: var(--text-primary); outline: none; cursor: pointer;
+  }
+  .day-select option { background: #1a1a2e; color: var(--text-primary); }
 
   /* Task list */
   .task-list { display: flex; flex-direction: column; gap: 10px; }
@@ -103,7 +121,6 @@
   .task-card.removing { animation: slideOut .3s ease forwards; }
   @keyframes slideOut { to { opacity:0; transform: translateX(40px); height:0; padding:0; margin:0; border:0; overflow:hidden; } }
 
-  /* Priority indicator (left bar) */
   .task-card[data-priority="red"]    { border-left: 3px solid var(--red); }
   .task-card[data-priority="yellow"] { border-left: 3px solid var(--yellow); }
   .task-card[data-priority="green"]  { border-left: 3px solid var(--green); }
@@ -129,22 +146,15 @@
   }
   .task-card.done .task-text { text-decoration: line-through; color: var(--text-secondary); }
   .task-meta { display: flex; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
-  .badge {
-    font-size: 10px; padding: 1px 6px; border-radius: 8px;
-    white-space: nowrap;
-  }
+  .badge { font-size: 10px; padding: 1px 6px; border-radius: 8px; white-space: nowrap; }
   .badge-freq { background: rgba(124,92,252,.2); color: var(--accent-hover); }
-  .badge-preset { background: rgba(255,255,255,.08); color: var(--text-secondary); }
 
-  /* Inline edit */
-  .task-text.editing { cursor: default; }
   .edit-input {
     width: 100%; background: rgba(255,255,255,.08); border: 1px solid var(--accent);
     border-radius: 8px; padding: 6px 10px; font-size: 15px;
     color: var(--text-primary); outline: none; font-family: inherit; line-height: 1.45;
   }
 
-  /* Actions */
   .task-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
   .task-actions button {
     background: none; border: none; color: var(--text-secondary);
@@ -231,6 +241,26 @@
     </div>
   </div>
 
+  <!-- 每周：选星期几 -->
+  <div class="day-row" id="weeklyRow">
+    <span class="day-label">每</span>
+    <button class="day-btn" data-day="1">一</button>
+    <button class="day-btn" data-day="2">二</button>
+    <button class="day-btn" data-day="3">三</button>
+    <button class="day-btn" data-day="4">四</button>
+    <button class="day-btn" data-day="5">五</button>
+    <button class="day-btn" data-day="6">六</button>
+    <button class="day-btn" data-day="0">日</button>
+  </div>
+
+  <!-- 每月：选几号 -->
+  <div class="day-row" id="monthlyRow">
+    <span class="day-label">每月</span>
+    <select class="day-select" id="monthlySelect">
+    </select>
+    <span class="day-label">号</span>
+  </div>
+
   <div class="task-list" id="taskList"></div>
   <div class="collapse-bar" id="collapseBar" style="display:none">
     <span id="collapseLabel">Hide completed</span>
@@ -256,9 +286,8 @@
   var STORAGE_KEY_ORDER    = 'todo_order';
   var STORAGE_KEY_COLLAPSE = 'todo_collapse';
 
-  // 无预设任务，打开是空的，由用户自己添加
-
   var FREQ_LABELS = { daily: '\u6bcf\u65e5', weekly: '\u6bcf\u5468', monthly: '\u6bcf\u6708', once: '\u4e00\u6b21\u6027' };
+  var WEEKDAY_NAMES = ['\u65e5', '\u4e00', '\u4e8c', '\u4e09', '\u56db', '\u4e94', '\u516d']; // 日一二三四五六
 
   // ══════════════════════════════════════════
   //  DOM
@@ -273,6 +302,9 @@
   var collapseLabel= document.getElementById('collapseLabel');
   var toastContainer = document.getElementById('toastContainer');
   var storageModeEl = document.getElementById('storageMode');
+  var weeklyRow    = document.getElementById('weeklyRow');
+  var monthlyRow   = document.getElementById('monthlyRow');
+  var monthlySelect= document.getElementById('monthlySelect');
 
   // ══════════════════════════════════════════
   //  State
@@ -285,11 +317,22 @@
   var _idCounter = Date.now();
   var serverData = null;
 
-  // 当前选中的输入选项
   var currentFreq = 'daily';
   var currentPri  = 'none';
+  var currentWeekDay = new Date().getDay(); // 默认今天星期几
+  var currentMonthDay = new Date().getDate(); // 默认今天几号
 
   function uid() { return 't_' + (++_idCounter); }
+
+  // 初始化月份选择器 1-28
+  (function() {
+    for (var i = 1; i <= 28; i++) {
+      var opt = document.createElement('option');
+      opt.value = i; opt.textContent = i;
+      if (i === currentMonthDay) opt.selected = true;
+      monthlySelect.appendChild(opt);
+    }
+  })();
 
   // ══════════════════════════════════════════
   //  Server API
@@ -322,7 +365,6 @@
   function getDate() { return useServer && serverData ? (serverData.date || null) : loadSavedDate(); }
   function setDate(d) { if (useServer && serverData) { serverData.date = d; serverSave(); } else saveDate(d); }
 
-  // localStorage helpers
   function loadTasks() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || []; } catch(e){ return []; } }
   function saveTasks(t) { localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(t)); }
   function loadOrder() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY_ORDER)); } catch(e){ return null; } }
@@ -341,42 +383,6 @@
     return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
 
-  // 获取当前自然周的周一日期（YYYY-MM-DD）
-  function getWeekStart() {
-    var d = new Date();
-    var day = d.getDay(); // 0=Sun, 1=Mon...
-    var diff = day === 0 ? 6 : day - 1; // 周一为第一天
-    var monday = new Date(d);
-    monday.setDate(d.getDate() - diff);
-    return monday.getFullYear() + '-' + String(monday.getMonth()+1).padStart(2,'0') + '-' + String(monday.getDate()).padStart(2,'0');
-  }
-
-  // 获取当前月份（YYYY-MM）
-  function getMonthKey() {
-    var d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-  }
-
-  // 检查 completedAt 是否在本周内
-  function isCompletedThisWeek(completedAt) {
-    if (!completedAt) return false;
-    var completed = new Date(completedAt);
-    var weekStart = getWeekStart();
-    var parts = weekStart.split('-');
-    var monday = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
-    return completed >= monday;
-  }
-
-  // 检查 completedAt 是否在本月内
-  function isCompletedThisMonth(completedAt) {
-    if (!completedAt) return false;
-    var completed = new Date(completedAt);
-    var monthKey = getMonthKey();
-    var parts = monthKey.split('-');
-    var monthStart = new Date(parseInt(parts[0]), parseInt(parts[1])-1, 1);
-    return completed >= monthStart;
-  }
-
   // ══════════════════════════════════════════
   //  Daily reset + frequency logic
   // ══════════════════════════════════════════
@@ -387,10 +393,24 @@
     var tasks = getTasks();
 
     if (saved !== today) {
-      // 新的一天：重置每日任务的勾选
+      var now = new Date();
+      var todayDow = now.getDay(); // 0=Sun
+      var todayDom = now.getDate();
+
       tasks.forEach(function(t) {
-        if (t.frequency === 'daily' || !t.frequency) t.done = false;
+        if (t.frequency === 'daily' || !t.frequency) {
+          t.done = false;
+        }
+        // 每周任务：到了指定星期几，重置勾选
+        if (t.frequency === 'weekly' && todayDow === (t.resetDay !== undefined ? t.resetDay : 1)) {
+          t.done = false;
+        }
+        // 每月任务：到了指定日期，重置勾选
+        if (t.frequency === 'monthly' && todayDom === (t.resetDay || 1)) {
+          t.done = false;
+        }
       });
+
       setTasks(tasks);
       setDate(today);
     }
@@ -399,34 +419,27 @@
   }
 
   // 判断任务是否应该在当前视图中隐藏
-  // 返回 true = 隐藏（已完成且在本周期内）
   function shouldHide(task) {
     if (!task.done || !task.completedAt) return false;
+    var now = new Date();
     switch (task.frequency) {
-      case 'weekly':  return isCompletedThisWeek(task.completedAt);
-      case 'monthly': return isCompletedThisMonth(task.completedAt);
-      case 'once':    return true; // 一次性完成后永远隐藏
-      default:        return false; // 每日任务不隐藏（由 dailyReset 重置）
+      case 'weekly': {
+        var dow = now.getDay();
+        var targetDay = task.resetDay !== undefined ? task.resetDay : 1;
+        // 如果今天是目标星期几，不隐藏（刚重置的）
+        if (dow === targetDay) return false;
+        // 否则，已勾选就隐藏到下一个目标日
+        return true;
+      }
+      case 'monthly': {
+        var dom = now.getDate();
+        var targetDay = task.resetDay || 1;
+        if (dom === targetDay) return false;
+        return true;
+      }
+      case 'once':    return true;
+      default:        return false;
     }
-  }
-
-  // ══════════════════════════════════════════
-  //  Ordered tasks
-  // ══════════════════════════════════════════
-
-  function getOrderedTasks() {
-    var tasks = getTasks();
-    var savedOrder = getOrder();
-    if (savedOrder) {
-      var orderMap = {};
-      savedOrder.forEach(function(id, i) { orderMap[id] = i; });
-      tasks.sort(function(a, b) {
-        var ia = orderMap[a.id] !== undefined ? orderMap[a.id] : 999999;
-        var ib = orderMap[b.id] !== undefined ? orderMap[b.id] : 999999;
-        return ia - ib;
-      });
-    }
-    return tasks;
   }
 
   // ══════════════════════════════════════════
@@ -481,16 +494,6 @@
 
   function render() {
     var tasks = dailyReset();
-    var savedOrder = getOrder();
-    if (savedOrder) {
-      var orderMap = {};
-      savedOrder.forEach(function(id, i) { orderMap[id] = i; });
-      tasks.sort(function(a, b) {
-        var ia = orderMap[a.id] !== undefined ? orderMap[a.id] : 999999;
-        var ib = orderMap[b.id] !== undefined ? orderMap[b.id] : 999999;
-        return ia - ib;
-      });
-    }
 
     // 按优先级排序：红色 > 黄色 > 绿色 > 无
     var priOrder = { red: 0, yellow: 1, green: 2, none: 3 };
@@ -502,7 +505,6 @@
 
     taskListEl.innerHTML = '';
 
-    // 过滤掉应该隐藏的任务
     var visibleTasks = tasks.filter(function(t) { return !shouldHide(t); });
 
     if (visibleTasks.length === 0) {
@@ -515,7 +517,6 @@
     updateCollapseBar(tasks);
 
     visibleTasks.forEach(function(task) {
-      // 折叠模式下隐藏已完成
       if (collapsed && task.done) return;
 
       var card = document.createElement('div');
@@ -538,7 +539,7 @@
       checkDiv.appendChild(cb);
       checkDiv.appendChild(mark);
 
-      // Body (text + meta)
+      // Body
       var body = document.createElement('div');
       body.className = 'task-body';
 
@@ -548,7 +549,6 @@
       textSpan.addEventListener('dblclick', (function(id, ts) {
         return function(e) { e.stopPropagation(); startEdit(id, ts); };
       })(task.id, textSpan));
-
       body.appendChild(textSpan);
 
       // Meta badges
@@ -558,7 +558,14 @@
       if (freq !== 'daily') {
         var freqBadge = document.createElement('span');
         freqBadge.className = 'badge badge-freq';
-        freqBadge.textContent = FREQ_LABELS[freq] || freq;
+        // 显示具体重置日
+        if (freq === 'weekly' && task.resetDay !== undefined) {
+          freqBadge.textContent = '\u6bcf\u5468' + WEEKDAY_NAMES[task.resetDay];
+        } else if (freq === 'monthly' && task.resetDay) {
+          freqBadge.textContent = '\u6bcf\u6708' + task.resetDay + '\u53f7';
+        } else {
+          freqBadge.textContent = FREQ_LABELS[freq] || freq;
+        }
         meta.appendChild(freqBadge);
       }
       if (meta.children.length > 0) body.appendChild(meta);
@@ -683,14 +690,15 @@
   //  CRUD
   // ══════════════════════════════════════════
 
-  function addTask(text, freq, pri) {
+  function addTask(text, freq, pri, resetDay) {
     text = text.trim();
     if (!text) return;
     var tasks = getTasks();
     var task = {
-      id: uid(), text: text, done: false, preset: false,
+      id: uid(), text: text, done: false,
       created: Date.now(), frequency: freq || 'daily',
-      priority: pri || 'none', completedAt: null
+      priority: pri || 'none', completedAt: null,
+      resetDay: resetDay
     };
     tasks.push(task);
     setTasks(tasks);
@@ -707,11 +715,9 @@
         tasks[i].done = !tasks[i].done;
         if (tasks[i].done) {
           tasks[i].completedAt = Date.now();
-          // 一次性任务勾选后删除
           if (tasks[i].frequency === 'once') {
             tasks.splice(i, 1);
             setTasks(tasks);
-            // 清理 order
             var order = getOrder();
             if (order) { setOrder(order.filter(function(oid) { return oid !== id; })); }
             render();
@@ -762,7 +768,7 @@
   }
 
   function moveTask(id, direction) {
-    var tasks = getOrderedTasks();
+    var tasks = getTasks();
     var idx = -1;
     for (var i = 0; i < tasks.length; i++) { if (tasks[i].id === id) { idx = i; break; } }
     if (idx === -1) return;
@@ -774,7 +780,7 @@
   }
 
   function pinTask(id, where) {
-    var tasks = getOrderedTasks();
+    var tasks = getTasks();
     var idx = -1;
     for (var i = 0; i < tasks.length; i++) { if (tasks[i].id === id) { idx = i; break; } }
     if (idx === -1) return;
@@ -814,7 +820,7 @@
   }
 
   // ══════════════════════════════════════════
-  //  Input options (frequency + priority)
+  //  Input options
   // ══════════════════════════════════════════
 
   // Frequency buttons
@@ -824,6 +830,9 @@
       for (var j = 0; j < freqBtns.length; j++) freqBtns[j].classList.remove('active');
       this.classList.add('active');
       currentFreq = this.dataset.freq;
+      // 显示/隐藏重置日选择器
+      weeklyRow.classList.toggle('visible', currentFreq === 'weekly');
+      monthlyRow.classList.toggle('visible', currentFreq === 'monthly');
     });
   }
 
@@ -837,18 +846,45 @@
     });
   }
 
+  // Weekly day buttons
+  var weekDayBtns = document.querySelectorAll('.day-btn[data-day]');
+  for (var i = 0; i < weekDayBtns.length; i++) {
+    weekDayBtns[i].addEventListener('click', function() {
+      for (var j = 0; j < weekDayBtns.length; j++) weekDayBtns[j].classList.remove('active');
+      this.classList.add('active');
+      currentWeekDay = parseInt(this.dataset.day);
+    });
+  }
+  // 默认选中今天
+  var todayBtn = document.querySelector('.day-btn[data-day="' + currentWeekDay + '"]');
+  if (todayBtn) todayBtn.classList.add('active');
+
+  // Monthly select
+  monthlySelect.addEventListener('change', function() {
+    currentMonthDay = parseInt(this.value);
+  });
+
   // ══════════════════════════════════════════
   //  Events
   // ══════════════════════════════════════════
 
   addBtn.addEventListener('click', function() {
-    addTask(taskInput.value, currentFreq, currentPri);
+    var resetDay = null;
+    if (currentFreq === 'weekly') resetDay = currentWeekDay;
+    else if (currentFreq === 'monthly') resetDay = currentMonthDay;
+    addTask(taskInput.value, currentFreq, currentPri, resetDay);
     taskInput.value = '';
     taskInput.focus();
   });
 
   taskInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { addTask(taskInput.value, currentFreq, currentPri); taskInput.value = ''; }
+    if (e.key === 'Enter') {
+      var resetDay = null;
+      if (currentFreq === 'weekly') resetDay = currentWeekDay;
+      else if (currentFreq === 'monthly') resetDay = currentMonthDay;
+      addTask(taskInput.value, currentFreq, currentPri, resetDay);
+      taskInput.value = '';
+    }
   });
 
   // ══════════════════════════════════════════
