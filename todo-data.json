@@ -11,16 +11,6 @@
       "completedAt": null
     },
     {
-      "id": "t_1787058416555",
-      "text": "非技术面试题，至少1道",
-      "done": false,
-      "preset": false,
-      "created": 1787058458807,
-      "frequency": "daily",
-      "priority": "red",
-      "completedAt": null
-    },
-    {
       "id": "t_1787058416556",
       "text": "整理相册，不超5分钟",
       "done": true,
@@ -29,6 +19,16 @@
       "frequency": "daily",
       "priority": "green",
       "completedAt": 1787058979342
+    },
+    {
+      "id": "t_1787058416555",
+      "text": "非技术面试题，至少1道",
+      "done": false,
+      "preset": false,
+      "created": 1787058458807,
+      "frequency": "daily",
+      "priority": "red",
+      "completedAt": null
     }
   ],
   "order": [
