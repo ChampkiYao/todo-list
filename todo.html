@@ -19,6 +19,9 @@
     --accent-hover: #9b82fd;
     --danger: #ff5c6a;
     --success: #34d399;
+    --red: #ff5c6a;
+    --yellow: #fbbf24;
+    --green: #34d399;
     --radius: 14px;
     --transition: .25s cubic-bezier(.4,0,.2,1);
   }
@@ -36,7 +39,6 @@
 
   .app { width: 100%; max-width: 520px; }
 
-  /* Header */
   .header { text-align: center; margin-bottom: 28px; }
   .header h1 {
     font-size: 28px; font-weight: 700; letter-spacing: -.5px;
@@ -45,25 +47,42 @@
   }
   .header .date-display { margin-top: 6px; font-size: 13px; color: var(--text-secondary); }
 
-  /* Input */
-  .input-area { display: flex; gap: 10px; margin-bottom: 20px; }
-  .input-area input {
+  /* Input area */
+  .input-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .input-row input {
     flex: 1; background: var(--glass-bg); border: 1px solid var(--glass-border);
     border-radius: var(--radius); padding: 14px 18px; font-size: 15px;
     color: var(--text-primary); outline: none;
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     transition: border-color var(--transition);
   }
-  .input-area input::placeholder { color: var(--text-secondary); }
-  .input-area input:focus { border-color: var(--accent); }
-  .input-area button {
+  .input-row input::placeholder { color: var(--text-secondary); }
+  .input-row input:focus { border-color: var(--accent); }
+  .input-row .btn-add {
     background: var(--accent); border: none; border-radius: var(--radius);
     padding: 0 22px; font-size: 26px; color: #fff; cursor: pointer;
     transition: background var(--transition), transform var(--transition);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
-  .input-area button:hover { background: var(--accent-hover); transform: scale(1.05); }
-  .input-area button:active { transform: scale(.95); }
+  .input-row .btn-add:hover { background: var(--accent-hover); transform: scale(1.05); }
+  .input-row .btn-add:active { transform: scale(.95); }
+
+  /* Options row: frequency + priority */
+  .options-row {
+    display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+  }
+  .opt-group { display: flex; gap: 4px; align-items: center; }
+  .opt-group-label { font-size: 11px; color: var(--text-secondary); margin-right: 2px; }
+  .opt-btn {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px; padding: 4px 10px; font-size: 12px;
+    color: var(--text-secondary); cursor: pointer; transition: all var(--transition);
+  }
+  .opt-btn:hover { color: var(--text-primary); border-color: rgba(255,255,255,.25); }
+  .opt-btn.active { color: #fff; border-color: var(--accent); background: rgba(124,92,252,.25); }
+  .opt-btn.p-red.active { border-color: var(--red); background: rgba(255,92,106,.25); color: var(--red); }
+  .opt-btn.p-yellow.active { border-color: var(--yellow); background: rgba(251,191,36,.25); color: var(--yellow); }
+  .opt-btn.p-green.active { border-color: var(--green); background: rgba(52,211,153,.25); color: var(--green); }
 
   /* Task list */
   .task-list { display: flex; flex-direction: column; gap: 10px; }
@@ -83,8 +102,11 @@
   .task-card.drag-over { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(124,92,252,.35); }
   .task-card.removing { animation: slideOut .3s ease forwards; }
   @keyframes slideOut { to { opacity:0; transform: translateX(40px); height:0; padding:0; margin:0; border:0; overflow:hidden; } }
-  .task-card.entering { animation: slideIn .3s ease; }
-  @keyframes slideIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+
+  /* Priority indicator (left bar) */
+  .task-card[data-priority="red"]    { border-left: 3px solid var(--red); }
+  .task-card[data-priority="yellow"] { border-left: 3px solid var(--yellow); }
+  .task-card[data-priority="green"]  { border-left: 3px solid var(--green); }
 
   /* Checkbox */
   .task-check { position: relative; width: 22px; height: 22px; flex-shrink: 0; }
@@ -100,11 +122,19 @@
     border-width: 0 2px 2px 0; transform: rotate(45deg);
   }
 
+  .task-body { flex: 1; min-width: 0; }
   .task-text {
-    flex: 1; font-size: 15px; line-height: 1.45;
+    font-size: 15px; line-height: 1.45;
     word-break: break-word; transition: all var(--transition); cursor: default;
   }
   .task-card.done .task-text { text-decoration: line-through; color: var(--text-secondary); }
+  .task-meta { display: flex; gap: 6px; margin-top: 3px; flex-wrap: wrap; }
+  .badge {
+    font-size: 10px; padding: 1px 6px; border-radius: 8px;
+    white-space: nowrap;
+  }
+  .badge-freq { background: rgba(124,92,252,.2); color: var(--accent-hover); }
+  .badge-preset { background: rgba(255,255,255,.08); color: var(--text-secondary); }
 
   /* Inline edit */
   .task-text.editing { cursor: default; }
@@ -122,11 +152,8 @@
     transition: all var(--transition); display: flex; align-items: center; justify-content: center;
   }
   .task-actions button:hover { color: var(--text-primary); background: rgba(255,255,255,.1); }
-  .task-actions .btn-pin { font-size: 14px; }
   .task-actions .btn-pin:hover { color: var(--accent-hover); }
   .task-actions .btn-delete:hover { color: var(--danger); background: rgba(255,92,106,.12); }
-  .task-actions button:disabled { opacity: .2; cursor: default; }
-  .task-actions button:disabled:hover { color: var(--text-secondary); background: none; }
 
   /* Collapse bar */
   .collapse-bar {
@@ -162,28 +189,14 @@
   @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(16px); } }
 
-  /* Stats */
   .stats { text-align: center; margin-top: 24px; font-size: 13px; color: var(--text-secondary); }
-
-  /* Storage mode indicator */
-  .storage-mode {
-    text-align: center; margin-top: 8px; font-size: 11px; color: var(--text-secondary); opacity: .5;
-  }
-
-  /* Empty */
+  .storage-mode { text-align: center; margin-top: 8px; font-size: 11px; color: var(--text-secondary); opacity: .5; }
   .empty { text-align: center; padding: 60px 0; color: var(--text-secondary); font-size: 15px; }
   .empty .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
 
-  /* Preset tag */
-  .preset-tag {
-    font-size: 10px; background: rgba(124,92,252,.25); color: var(--accent-hover);
-    padding: 1px 6px; border-radius: 8px; margin-left: 6px;
-    vertical-align: middle; white-space: nowrap;
-  }
-
   @media (max-width: 480px) {
     body { padding: 16px 10px 80px; }
-    .input-area input { padding: 12px 14px; font-size: 14px; }
+    .input-row input { padding: 12px 14px; font-size: 14px; }
     .task-card { padding: 10px 12px; }
     .task-actions button { padding: 4px 8px; font-size: 13px; }
   }
@@ -196,9 +209,26 @@
     <div class="date-display" id="dateDisplay"></div>
   </div>
 
-  <div class="input-area">
+  <div class="input-row">
     <input type="text" id="taskInput" placeholder="Add a new task..." maxlength="200" autocomplete="off">
-    <button id="addBtn" title="Add task">+</button>
+    <button class="btn-add" id="addBtn" title="Add task">+</button>
+  </div>
+
+  <div class="options-row">
+    <div class="opt-group">
+      <span class="opt-group-label">频率</span>
+      <button class="opt-btn active" data-freq="daily">每日</button>
+      <button class="opt-btn" data-freq="weekly">每周</button>
+      <button class="opt-btn" data-freq="monthly">每月</button>
+      <button class="opt-btn" data-freq="once">一次性</button>
+    </div>
+    <div class="opt-group">
+      <span class="opt-group-label">重要</span>
+      <button class="opt-btn active" data-pri="none">无</button>
+      <button class="opt-btn p-red" data-pri="red">红</button>
+      <button class="opt-btn p-yellow" data-pri="yellow">黄</button>
+      <button class="opt-btn p-green" data-pri="green">绿</button>
+    </div>
   </div>
 
   <div class="task-list" id="taskList"></div>
@@ -226,58 +256,57 @@
   var STORAGE_KEY_ORDER    = 'todo_order';
   var STORAGE_KEY_COLLAPSE = 'todo_collapse';
 
+  // 预设任务（每日自动添加）
   var PRESET_TASKS = [
-    'Review today\'s schedule',
-    'Stay hydrated — drink water',
-    'Plan top 3 priorities',
-    'Take a short break every hour',
-    'Reflect & plan tomorrow before bed'
+    { text: 'Review today\'s schedule', freq: 'daily', priority: 'none' },
+    { text: 'Stay hydrated \u2014 drink water', freq: 'daily', priority: 'none' },
+    { text: 'Plan top 3 priorities', freq: 'daily', priority: 'none' },
+    { text: 'Take a short break every hour', freq: 'daily', priority: 'none' },
+    { text: 'Reflect & plan tomorrow before bed', freq: 'daily', priority: 'none' }
   ];
 
+  var FREQ_LABELS = { daily: '\u6bcf\u65e5', weekly: '\u6bcf\u5468', monthly: '\u6bcf\u6708', once: '\u4e00\u6b21\u6027' };
+
   // ══════════════════════════════════════════
-  //  DOM refs
+  //  DOM
   // ══════════════════════════════════════════
 
-  var taskInput      = document.getElementById('taskInput');
-  var addBtn         = document.getElementById('addBtn');
-  var taskListEl     = document.getElementById('taskList');
-  var dateEl         = document.getElementById('dateDisplay');
-  var statsEl        = document.getElementById('stats');
-  var collapseBar    = document.getElementById('collapseBar');
-  var collapseLabel  = document.getElementById('collapseLabel');
+  var taskInput    = document.getElementById('taskInput');
+  var addBtn       = document.getElementById('addBtn');
+  var taskListEl   = document.getElementById('taskList');
+  var dateEl       = document.getElementById('dateDisplay');
+  var statsEl      = document.getElementById('stats');
+  var collapseBar  = document.getElementById('collapseBar');
+  var collapseLabel= document.getElementById('collapseLabel');
   var toastContainer = document.getElementById('toastContainer');
-  var storageModeEl  = document.getElementById('storageMode');
+  var storageModeEl = document.getElementById('storageMode');
 
   // ══════════════════════════════════════════
   //  State
   // ══════════════════════════════════════════
 
-  var useServer   = false;  // true = server JSON file, false = localStorage
-  var collapsed   = loadCollapse();
-  var undoTimer   = null;
+  var useServer = false;
+  var collapsed = loadCollapse();
+  var undoTimer = null;
   var pendingDelete = null;
-  var _idCounter  = Date.now();
-  var serverData  = null;   // in-memory copy when using server mode
+  var _idCounter = Date.now();
+  var serverData = null;
+
+  // 当前选中的输入选项
+  var currentFreq = 'daily';
+  var currentPri  = 'none';
 
   function uid() { return 't_' + (++_idCounter); }
 
   // ══════════════════════════════════════════
-  //  Server API (fetch / POST)
+  //  Server API
   // ══════════════════════════════════════════
 
   function serverLoad() {
     return fetch(API_BASE)
       .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function(data) {
-        serverData = data;
-        useServer = true;
-        storageModeEl.textContent = 'Synced to todo-data.json';
-      })
-      .catch(function() {
-        useServer = false;
-        serverData = null;
-        storageModeEl.textContent = 'Local mode (localStorage)';
-      });
+      .then(function(data) { serverData = data; useServer = true; storageModeEl.textContent = 'Synced to todo-data.json'; })
+      .catch(function() { useServer = false; serverData = null; storageModeEl.textContent = 'Local mode (localStorage)'; });
   }
 
   function serverSave() {
@@ -286,85 +315,78 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(serverData)
-    }).catch(function() {
-      // Silently fail — data stays in memory, will retry on next change
-    });
+    }).catch(function() {});
   }
 
   // ══════════════════════════════════════════
-  //  Unified storage layer
+  //  Unified storage
   // ══════════════════════════════════════════
 
-  function getTasks() {
-    if (useServer && serverData) return serverData.tasks || [];
-    return loadTasks();
-  }
+  function getTasks() { return useServer && serverData ? (serverData.tasks || []) : loadTasks(); }
+  function setTasks(t) { if (useServer && serverData) { serverData.tasks = t; serverSave(); } else saveTasks(t); }
+  function getOrder() { return useServer && serverData ? (serverData.order || null) : loadOrder(); }
+  function setOrder(o) { if (useServer && serverData) { serverData.order = o; serverSave(); } else saveOrder(o); }
+  function getDate() { return useServer && serverData ? (serverData.date || null) : loadSavedDate(); }
+  function setDate(d) { if (useServer && serverData) { serverData.date = d; serverSave(); } else saveDate(d); }
 
-  function setTasks(tasks) {
-    if (useServer && serverData) { serverData.tasks = tasks; serverSave(); return; }
-    saveTasks(tasks);
-  }
-
-  function getOrder() {
-    if (useServer && serverData) return serverData.order || null;
-    return loadOrder();
-  }
-
-  function setOrder(order) {
-    if (useServer && serverData) { serverData.order = order; serverSave(); return; }
-    saveOrder(order);
-  }
-
-  function getDate() {
-    if (useServer && serverData) return serverData.date || null;
-    return loadSavedDate();
-  }
-
-  function setDate(d) {
-    if (useServer && serverData) { serverData.date = d; serverSave(); return; }
-    saveDate(d);
-  }
-
-  // Collapse is always localStorage (cosmetic only)
-  function loadCollapse() {
-    return localStorage.getItem(STORAGE_KEY_COLLAPSE) === '1';
-  }
-  function saveCollapse(v) {
-    localStorage.setItem(STORAGE_KEY_COLLAPSE, v ? '1' : '0');
-  }
-
-  // localStorage helpers (fallback mode)
-  function loadTasks() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || []; }
-    catch (e) { return []; }
-  }
-  function saveTasks(tasks) {
-    localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
-  }
-  function loadOrder() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_ORDER)); }
-    catch (e) { return null; }
-  }
-  function saveOrder(order) {
-    localStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
-  }
-  function loadSavedDate() {
-    return localStorage.getItem(STORAGE_KEY_DATE);
-  }
-  function saveDate(d) {
-    localStorage.setItem(STORAGE_KEY_DATE, d);
-  }
+  // localStorage helpers
+  function loadTasks() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || []; } catch(e){ return []; } }
+  function saveTasks(t) { localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(t)); }
+  function loadOrder() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY_ORDER)); } catch(e){ return null; } }
+  function saveOrder(o) { localStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(o)); }
+  function loadSavedDate() { return localStorage.getItem(STORAGE_KEY_DATE); }
+  function saveDate(d) { localStorage.setItem(STORAGE_KEY_DATE, d); }
+  function loadCollapse() { return localStorage.getItem(STORAGE_KEY_COLLAPSE) === '1'; }
+  function saveCollapse(v) { localStorage.setItem(STORAGE_KEY_COLLAPSE, v ? '1' : '0'); }
 
   // ══════════════════════════════════════════
-  //  Daily reset
+  //  Date helpers
   // ══════════════════════════════════════════
 
   function todayKey() {
     var d = new Date();
-    return d.getFullYear() + '-' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' +
-      String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   }
+
+  // 获取当前自然周的周一日期（YYYY-MM-DD）
+  function getWeekStart() {
+    var d = new Date();
+    var day = d.getDay(); // 0=Sun, 1=Mon...
+    var diff = day === 0 ? 6 : day - 1; // 周一为第一天
+    var monday = new Date(d);
+    monday.setDate(d.getDate() - diff);
+    return monday.getFullYear() + '-' + String(monday.getMonth()+1).padStart(2,'0') + '-' + String(monday.getDate()).padStart(2,'0');
+  }
+
+  // 获取当前月份（YYYY-MM）
+  function getMonthKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+  }
+
+  // 检查 completedAt 是否在本周内
+  function isCompletedThisWeek(completedAt) {
+    if (!completedAt) return false;
+    var completed = new Date(completedAt);
+    var weekStart = getWeekStart();
+    var parts = weekStart.split('-');
+    var monday = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+    return completed >= monday;
+  }
+
+  // 检查 completedAt 是否在本月内
+  function isCompletedThisMonth(completedAt) {
+    if (!completedAt) return false;
+    var completed = new Date(completedAt);
+    var monthKey = getMonthKey();
+    var parts = monthKey.split('-');
+    var monthStart = new Date(parseInt(parts[0]), parseInt(parts[1])-1, 1);
+    return completed >= monthStart;
+  }
+
+  // ══════════════════════════════════════════
+  //  Daily reset + frequency logic
+  // ══════════════════════════════════════════
 
   function dailyReset() {
     var today = todayKey();
@@ -372,15 +394,23 @@
     var tasks = getTasks();
 
     if (saved !== today) {
-      tasks.forEach(function(t) { t.done = false; });
+      // 新的一天：重置每日任务的勾选
+      tasks.forEach(function(t) {
+        if (t.frequency === 'daily' || !t.frequency) t.done = false;
+      });
 
+      // 添加预设任务（如果不存在）
       var existingTexts = {};
       tasks.forEach(function(t) { existingTexts[t.text.toLowerCase()] = true; });
 
       var newPresets = PRESET_TASKS
-        .filter(function(p) { return !existingTexts[p.toLowerCase()]; })
+        .filter(function(p) { return !existingTexts[p.text.toLowerCase()]; })
         .map(function(p) {
-          return { id: uid(), text: p, done: false, preset: true, created: Date.now() };
+          return {
+            id: uid(), text: p.text, done: false, preset: true,
+            created: Date.now(), frequency: p.freq || 'daily',
+            priority: p.priority || 'none', completedAt: null
+          };
         });
 
       tasks = tasks.concat(newPresets);
@@ -389,6 +419,18 @@
     }
 
     return tasks;
+  }
+
+  // 判断任务是否应该在当前视图中隐藏
+  // 返回 true = 隐藏（已完成且在本周期内）
+  function shouldHide(task) {
+    if (!task.done || !task.completedAt) return false;
+    switch (task.frequency) {
+      case 'weekly':  return isCompletedThisWeek(task.completedAt);
+      case 'monthly': return isCompletedThisMonth(task.completedAt);
+      case 'once':    return true; // 一次性完成后永远隐藏
+      default:        return false; // 每日任务不隐藏（由 dailyReset 重置）
+    }
   }
 
   // ══════════════════════════════════════════
@@ -417,23 +459,15 @@
   function showToast(msg, onUndo) {
     if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
     toastContainer.innerHTML = '';
-
     var toast = document.createElement('div');
     toast.className = 'toast';
-
     var text = document.createElement('span');
     text.textContent = msg;
-
     var btn = document.createElement('button');
     btn.className = 'toast-undo';
     btn.textContent = 'Undo';
-    btn.addEventListener('click', function() {
-      onUndo();
-      dismissToast(toast);
-    });
-
-    toast.appendChild(text);
-    toast.appendChild(btn);
+    btn.addEventListener('click', function() { onUndo(); dismissToast(toast); });
+    toast.appendChild(text); toast.appendChild(btn);
     toastContainer.appendChild(toast);
     undoTimer = setTimeout(function() { dismissToast(toast); }, 3000);
   }
@@ -442,8 +476,7 @@
     if (!el || !el.parentNode) return;
     el.classList.add('hiding');
     setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 300);
-    undoTimer = null;
-    pendingDelete = null;
+    undoTimer = null; pendingDelete = null;
   }
 
   // ══════════════════════════════════════════
@@ -451,7 +484,7 @@
   // ══════════════════════════════════════════
 
   function updateCollapseBar(tasks) {
-    var doneCount = tasks.filter(function(t) { return t.done; }).length;
+    var doneCount = tasks.filter(function(t) { return t.done && !shouldHide(t); }).length;
     collapseBar.style.display = doneCount > 0 ? '' : 'none';
     collapseLabel.textContent = collapsed
       ? 'Show completed (' + doneCount + ')'
@@ -484,7 +517,10 @@
 
     taskListEl.innerHTML = '';
 
-    if (tasks.length === 0) {
+    // 过滤掉应该隐藏的任务
+    var visibleTasks = tasks.filter(function(t) { return !shouldHide(t); });
+
+    if (visibleTasks.length === 0) {
       taskListEl.innerHTML = '<div class="empty"><div class="empty-icon">&#10003;</div>No tasks yet. Add one above!</div>';
       statsEl.textContent = '';
       collapseBar.style.display = 'none';
@@ -493,12 +529,14 @@
 
     updateCollapseBar(tasks);
 
-    tasks.forEach(function(task) {
+    visibleTasks.forEach(function(task) {
+      // 折叠模式下隐藏已完成
       if (collapsed && task.done) return;
 
       var card = document.createElement('div');
       card.className = 'task-card' + (task.done ? ' done' : '');
       card.dataset.id = task.id;
+      card.dataset.priority = task.priority || 'none';
       card.draggable = true;
 
       // Checkbox
@@ -515,19 +553,36 @@
       checkDiv.appendChild(cb);
       checkDiv.appendChild(mark);
 
-      // Text
+      // Body (text + meta)
+      var body = document.createElement('div');
+      body.className = 'task-body';
+
       var textSpan = document.createElement('span');
       textSpan.className = 'task-text';
       textSpan.textContent = task.text;
-      if (task.preset) {
-        var tag = document.createElement('span');
-        tag.className = 'preset-tag';
-        tag.textContent = 'daily';
-        textSpan.appendChild(tag);
+      textSpan.addEventListener('dblclick', (function(id, ts) {
+        return function(e) { e.stopPropagation(); startEdit(id, ts); };
+      })(task.id, textSpan));
+
+      body.appendChild(textSpan);
+
+      // Meta badges
+      var meta = document.createElement('div');
+      meta.className = 'task-meta';
+      var freq = task.frequency || 'daily';
+      if (freq !== 'daily') {
+        var freqBadge = document.createElement('span');
+        freqBadge.className = 'badge badge-freq';
+        freqBadge.textContent = FREQ_LABELS[freq] || freq;
+        meta.appendChild(freqBadge);
       }
-      textSpan.addEventListener('dblclick', (function(id, ts, c) {
-        return function(e) { e.stopPropagation(); startEdit(id, ts, c); };
-      })(task.id, textSpan, card));
+      if (task.preset) {
+        var presetBadge = document.createElement('span');
+        presetBadge.className = 'badge badge-preset';
+        presetBadge.textContent = 'daily';
+        meta.appendChild(presetBadge);
+      }
+      if (meta.children.length > 0) body.appendChild(meta);
 
       // Actions
       var actions = document.createElement('div');
@@ -561,15 +616,11 @@
       delBtn.title = 'Delete task';
       delBtn.addEventListener('click', (function(id) { return function() { deleteTask(id); }; })(task.id));
 
-      actions.appendChild(pinTop);
-      actions.appendChild(pinBot);
-      actions.appendChild(upBtn);
-      actions.appendChild(downBtn);
+      actions.appendChild(pinTop); actions.appendChild(pinBot);
+      actions.appendChild(upBtn); actions.appendChild(downBtn);
       actions.appendChild(delBtn);
 
-      card.appendChild(checkDiv);
-      card.appendChild(textSpan);
-      card.appendChild(actions);
+      card.appendChild(checkDiv); card.appendChild(body); card.appendChild(actions);
 
       // Drag (desktop)
       card.addEventListener('dragstart', onDragStart);
@@ -587,7 +638,6 @@
           ts.card = el;
         };
       })(touchState, card), { passive: true });
-
       card.addEventListener('touchmove', (function(ts) {
         return function(e) {
           if (!ts.card) return;
@@ -597,67 +647,55 @@
           var overCard = overEl ? overEl.closest('.task-card') : null;
           if (overCard && overCard !== ts.card) {
             var overRect = overCard.getBoundingClientRect();
-            var overMid = overRect.top + overRect.height / 2;
-            if (touchY < overMid) taskListEl.insertBefore(ts.card, overCard);
-            else taskListEl.insertBefore(ts.card, overCard.nextSibling);
+            if (touchY < overRect.top + overRect.height / 2)
+              taskListEl.insertBefore(ts.card, overCard);
+            else
+              taskListEl.insertBefore(ts.card, overCard.nextSibling);
           }
         };
       })(touchState), { passive: false });
-
       card.addEventListener('touchend', (function(ts) {
-        return function() {
-          if (ts.card) { ts.card = null; persistCurrentOrder(); render(); }
-        };
+        return function() { if (ts.card) { ts.card = null; persistCurrentOrder(); render(); } };
       })(touchState), { passive: true });
 
       taskListEl.appendChild(card);
     });
 
-    var done = tasks.filter(function(t) { return t.done; }).length;
-    statsEl.textContent = done + ' / ' + tasks.length + ' completed';
+    var visible = tasks.filter(function(t) { return !shouldHide(t); });
+    var done = visible.filter(function(t) { return t.done; }).length;
+    statsEl.textContent = done + ' / ' + visible.length + ' completed';
   }
 
   // ══════════════════════════════════════════
   //  Inline edit
   // ══════════════════════════════════════════
 
-  function startEdit(id, textSpan, card) {
+  function startEdit(id, textSpan) {
     if (textSpan.querySelector('.edit-input')) return;
     var tasks = getTasks();
     var task = null;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === id) { task = tasks[i]; break; }
-    }
+    for (var i = 0; i < tasks.length; i++) { if (tasks[i].id === id) { task = tasks[i]; break; } }
     if (!task) return;
 
     var input = document.createElement('input');
-    input.type = 'text';
-    input.className = 'edit-input';
-    input.value = task.text;
-    input.maxLength = 200;
-
+    input.type = 'text'; input.className = 'edit-input';
+    input.value = task.text; input.maxLength = 200;
     textSpan.classList.add('editing');
     textSpan.textContent = '';
     textSpan.appendChild(input);
-    input.focus();
-    input.select();
+    input.focus(); input.select();
 
     var committed = false;
     function commit() {
-      if (committed) return;
-      committed = true;
+      if (committed) return; committed = true;
       var val = input.value.trim();
-      if (val && val !== task.text) {
-        task.text = val;
-        setTasks(tasks);
-      }
+      if (val && val !== task.text) { task.text = val; setTasks(tasks); }
       render();
     }
     function cancel() { committed = true; render(); }
-
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') { e.preventDefault(); commit(); }
-      else if (e.key === 'Escape') { cancel(); }
+      else if (e.key === 'Escape') cancel();
     });
     input.addEventListener('blur', commit);
   }
@@ -666,11 +704,15 @@
   //  CRUD
   // ══════════════════════════════════════════
 
-  function addTask(text) {
+  function addTask(text, freq, pri) {
     text = text.trim();
     if (!text) return;
     var tasks = getTasks();
-    var task = { id: uid(), text: text, done: false, preset: false, created: Date.now() };
+    var task = {
+      id: uid(), text: text, done: false, preset: false,
+      created: Date.now(), frequency: freq || 'daily',
+      priority: pri || 'none', completedAt: null
+    };
     tasks.push(task);
     setTasks(tasks);
     var order = getOrder() || tasks.map(function(t) { return t.id; });
@@ -682,7 +724,25 @@
   function toggleTask(id) {
     var tasks = getTasks();
     for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === id) { tasks[i].done = !tasks[i].done; break; }
+      if (tasks[i].id === id) {
+        tasks[i].done = !tasks[i].done;
+        if (tasks[i].done) {
+          tasks[i].completedAt = Date.now();
+          // 一次性任务勾选后删除
+          if (tasks[i].frequency === 'once') {
+            tasks.splice(i, 1);
+            setTasks(tasks);
+            // 清理 order
+            var order = getOrder();
+            if (order) { setOrder(order.filter(function(oid) { return oid !== id; })); }
+            render();
+            return;
+          }
+        } else {
+          tasks[i].completedAt = null;
+        }
+        break;
+      }
     }
     setTasks(tasks);
     render();
@@ -690,8 +750,7 @@
 
   function deleteTask(id) {
     var tasks = getTasks();
-    var task = null;
-    var idx = -1;
+    var task = null; var idx = -1;
     for (var i = 0; i < tasks.length; i++) {
       if (tasks[i].id === id) { task = tasks[i]; idx = i; break; }
     }
@@ -704,79 +763,47 @@
     var card = taskListEl.querySelector('[data-id="' + id + '"]');
     if (card) card.classList.add('removing');
 
-    var newTasks = [];
-    for (var j = 0; j < tasks.length; j++) {
-      if (tasks[j].id !== id) newTasks.push(tasks[j]);
-    }
+    var newTasks = tasks.filter(function(t) { return t.id !== id; });
     setTasks(newTasks);
-
-    if (order) {
-      var newOrder = order.filter(function(oid) { return oid !== id; });
-      setOrder(newOrder);
-    }
+    if (order) setOrder(order.filter(function(oid) { return oid !== id; }));
 
     showToast('Task deleted', function() {
       if (!pendingDelete) return;
       var restored = getTasks();
-      var insertAt = Math.min(pendingDelete.index, restored.length);
-      restored.splice(insertAt, 0, pendingDelete.task);
+      restored.splice(Math.min(pendingDelete.index, restored.length), 0, pendingDelete.task);
       setTasks(restored);
-
       var restoredOrder = getOrder() || restored.map(function(t) { return t.id; });
-      var orderInsertAt = Math.min(
-        pendingDelete.orderIndex >= 0 ? pendingDelete.orderIndex : restoredOrder.length,
-        restoredOrder.length
-      );
-      if (pendingDelete.orderIndex >= 0) {
-        restoredOrder.splice(orderInsertAt, 0, pendingDelete.task.id);
-      }
+      if (pendingDelete.orderIndex >= 0 && pendingDelete.orderIndex <= restoredOrder.length)
+        restoredOrder.splice(pendingDelete.orderIndex, 0, pendingDelete.task.id);
       setOrder(restoredOrder);
       pendingDelete = null;
       render();
     });
-
     setTimeout(function() { render(); }, 280);
   }
 
   function moveTask(id, direction) {
     var tasks = getOrderedTasks();
     var idx = -1;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === id) { idx = i; break; }
-    }
+    for (var i = 0; i < tasks.length; i++) { if (tasks[i].id === id) { idx = i; break; } }
     if (idx === -1) return;
     var newIdx = idx + direction;
     if (newIdx < 0 || newIdx >= tasks.length) return;
-
-    var temp = tasks[idx];
-    tasks[idx] = tasks[newIdx];
-    tasks[newIdx] = temp;
-
-    setTasks(tasks);
-    setOrder(tasks.map(function(t) { return t.id; }));
+    var temp = tasks[idx]; tasks[idx] = tasks[newIdx]; tasks[newIdx] = temp;
+    setTasks(tasks); setOrder(tasks.map(function(t) { return t.id; }));
     render();
   }
 
   function pinTask(id, where) {
     var tasks = getOrderedTasks();
     var idx = -1;
-    for (var i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === id) { idx = i; break; }
-    }
+    for (var i = 0; i < tasks.length; i++) { if (tasks[i].id === id) { idx = i; break; } }
     if (idx === -1) return;
-
     var task = tasks.splice(idx, 1)[0];
-    if (where === 'top') tasks.unshift(task);
-    else tasks.push(task);
-
-    setTasks(tasks);
-    setOrder(tasks.map(function(t) { return t.id; }));
+    if (where === 'top') tasks.unshift(task); else tasks.push(task);
+    setTasks(tasks); setOrder(tasks.map(function(t) { return t.id; }));
     render();
   }
-
-  // ══════════════════════════════════════════
-  //  Drag & Drop
-  // ══════════════════════════════════════════
 
   function persistCurrentOrder() {
     var cards = taskListEl.querySelectorAll('.task-card');
@@ -785,43 +812,50 @@
     setOrder(order);
   }
 
+  // ══════════════════════════════════════════
+  //  Drag & Drop
+  // ══════════════════════════════════════════
+
   var dragSrcEl = null;
-  function onDragStart(e) {
-    dragSrcEl = this;
-    this.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', this.dataset.id);
-  }
-  function onDragEnd() {
-    this.classList.remove('dragging');
-    var cards = taskListEl.querySelectorAll('.task-card');
-    for (var i = 0; i < cards.length; i++) cards[i].classList.remove('drag-over');
-  }
+  function onDragStart(e) { dragSrcEl = this; this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', this.dataset.id); }
+  function onDragEnd() { this.classList.remove('dragging'); var c = taskListEl.querySelectorAll('.task-card'); for(var i=0;i<c.length;i++) c[i].classList.remove('drag-over'); }
   function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
   function onDragEnter(e) { e.preventDefault(); if (this !== dragSrcEl) this.classList.add('drag-over'); }
   function onDragLeave() { this.classList.remove('drag-over'); }
   function onDrop(e) {
     e.stopPropagation(); e.preventDefault();
     if (dragSrcEl !== this) {
-      var allCards = Array.prototype.slice.call(taskListEl.querySelectorAll('.task-card'));
-      var fromIdx = allCards.indexOf(dragSrcEl);
-      var toIdx   = allCards.indexOf(this);
-      if (fromIdx < toIdx) taskListEl.insertBefore(dragSrcEl, this.nextSibling);
+      var all = Array.prototype.slice.call(taskListEl.querySelectorAll('.task-card'));
+      var from = all.indexOf(dragSrcEl), to = all.indexOf(this);
+      if (from < to) taskListEl.insertBefore(dragSrcEl, this.nextSibling);
       else taskListEl.insertBefore(dragSrcEl, this);
-      persistCurrentOrder();
-      render();
+      persistCurrentOrder(); render();
     }
     this.classList.remove('drag-over');
   }
 
   // ══════════════════════════════════════════
-  //  Date display
+  //  Input options (frequency + priority)
   // ══════════════════════════════════════════
 
-  function showDate() {
-    var d = new Date();
-    var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    dateEl.textContent = d.toLocaleDateString('en-US', opts);
+  // Frequency buttons
+  var freqBtns = document.querySelectorAll('.opt-btn[data-freq]');
+  for (var i = 0; i < freqBtns.length; i++) {
+    freqBtns[i].addEventListener('click', function() {
+      for (var j = 0; j < freqBtns.length; j++) freqBtns[j].classList.remove('active');
+      this.classList.add('active');
+      currentFreq = this.dataset.freq;
+    });
+  }
+
+  // Priority buttons
+  var priBtns = document.querySelectorAll('.opt-btn[data-pri]');
+  for (var i = 0; i < priBtns.length; i++) {
+    priBtns[i].addEventListener('click', function() {
+      for (var j = 0; j < priBtns.length; j++) priBtns[j].classList.remove('active');
+      this.classList.add('active');
+      currentPri = this.dataset.pri;
+    });
   }
 
   // ══════════════════════════════════════════
@@ -829,23 +863,26 @@
   // ══════════════════════════════════════════
 
   addBtn.addEventListener('click', function() {
-    addTask(taskInput.value);
+    addTask(taskInput.value, currentFreq, currentPri);
     taskInput.value = '';
     taskInput.focus();
   });
 
   taskInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { addTask(taskInput.value); taskInput.value = ''; }
+    if (e.key === 'Enter') { addTask(taskInput.value, currentFreq, currentPri); taskInput.value = ''; }
   });
 
   // ══════════════════════════════════════════
   //  Init
   // ══════════════════════════════════════════
 
+  function showDate() {
+    var d = new Date();
+    dateEl.textContent = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
   showDate();
-  serverLoad().then(function() {
-    render();
-  });
+  serverLoad().then(function() { render(); });
 
 })();
 </script>
