@@ -256,14 +256,7 @@
   var STORAGE_KEY_ORDER    = 'todo_order';
   var STORAGE_KEY_COLLAPSE = 'todo_collapse';
 
-  // 预设任务（每日自动添加）
-  var PRESET_TASKS = [
-    { text: 'Review today\'s schedule', freq: 'daily', priority: 'none' },
-    { text: 'Stay hydrated \u2014 drink water', freq: 'daily', priority: 'none' },
-    { text: 'Plan top 3 priorities', freq: 'daily', priority: 'none' },
-    { text: 'Take a short break every hour', freq: 'daily', priority: 'none' },
-    { text: 'Reflect & plan tomorrow before bed', freq: 'daily', priority: 'none' }
-  ];
+  // 无预设任务，打开是空的，由用户自己添加
 
   var FREQ_LABELS = { daily: '\u6bcf\u65e5', weekly: '\u6bcf\u5468', monthly: '\u6bcf\u6708', once: '\u4e00\u6b21\u6027' };
 
@@ -398,22 +391,6 @@
       tasks.forEach(function(t) {
         if (t.frequency === 'daily' || !t.frequency) t.done = false;
       });
-
-      // 添加预设任务（如果不存在）
-      var existingTexts = {};
-      tasks.forEach(function(t) { existingTexts[t.text.toLowerCase()] = true; });
-
-      var newPresets = PRESET_TASKS
-        .filter(function(p) { return !existingTexts[p.text.toLowerCase()]; })
-        .map(function(p) {
-          return {
-            id: uid(), text: p.text, done: false, preset: true,
-            created: Date.now(), frequency: p.freq || 'daily',
-            priority: p.priority || 'none', completedAt: null
-          };
-        });
-
-      tasks = tasks.concat(newPresets);
       setTasks(tasks);
       setDate(today);
     }
@@ -515,6 +492,14 @@
       });
     }
 
+    // 按优先级排序：红色 > 黄色 > 绿色 > 无
+    var priOrder = { red: 0, yellow: 1, green: 2, none: 3 };
+    tasks.sort(function(a, b) {
+      var pa = priOrder[a.priority] !== undefined ? priOrder[a.priority] : 3;
+      var pb = priOrder[b.priority] !== undefined ? priOrder[b.priority] : 3;
+      return pa - pb;
+    });
+
     taskListEl.innerHTML = '';
 
     // 过滤掉应该隐藏的任务
@@ -575,12 +560,6 @@
         freqBadge.className = 'badge badge-freq';
         freqBadge.textContent = FREQ_LABELS[freq] || freq;
         meta.appendChild(freqBadge);
-      }
-      if (task.preset) {
-        var presetBadge = document.createElement('span');
-        presetBadge.className = 'badge badge-preset';
-        presetBadge.textContent = 'daily';
-        meta.appendChild(presetBadge);
       }
       if (meta.children.length > 0) body.appendChild(meta);
 
