@@ -1,7 +1,7 @@
 @echo off
-title Todo List
+title 随手
 echo.
-echo   Starting Todo List...
+echo   Starting 随手...
 echo.
 
 :: Start server in background

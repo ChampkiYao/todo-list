@@ -1,23 +1,40 @@
 {
   "tasks": [
     {
-      "id": "t_1787043258495",
+      "id": "t_1787058416554",
       "text": "技术面试题，至少2道",
       "done": false,
       "preset": false,
-      "created": 1787043278975
+      "created": 1787058436164,
+      "frequency": "daily",
+      "priority": "red",
+      "completedAt": null
     },
     {
-      "id": "t_1787043258496",
+      "id": "t_1787058416555",
       "text": "非技术面试题，至少1道",
       "done": false,
       "preset": false,
-      "created": 1787043287418
+      "created": 1787058458807,
+      "frequency": "daily",
+      "priority": "red",
+      "completedAt": null
+    },
+    {
+      "id": "t_1787058416556",
+      "text": "整理相册，不超5分钟",
+      "done": true,
+      "preset": false,
+      "created": 1787058486521,
+      "frequency": "daily",
+      "priority": "green",
+      "completedAt": 1787058979342
     }
   ],
   "order": [
-    "t_1787043258495",
-    "t_1787043258496"
+    "t_1787058416554",
+    "t_1787058416556",
+    "t_1787058416555"
   ],
   "date": "2026-08-18",
   "collapse": false

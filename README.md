@@ -1,84 +1,73 @@
-# Todo List
+# 随手
 
-A minimalist single-file HTML todo app with frosted glass UI. Data saves to a local JSON file via a tiny Node.js server.
+一个极简单文件 HTML 待办工具，毛玻璃 UI，数据保存在本地 JSON 文件。
 
-## Quick Start (Windows)
+## 快速开始（Windows）
 
-### Option 1 — Desktop Shortcut (Recommended)
+### 方式一 — 桌面快捷方式（推荐）
 
-1. Double-click `create-shortcut.bat` (only needed once)
-2. A "Todo List" icon appears on your Desktop
-3. Double-click the icon anytime to launch
+1. 双击 `create-shortcut.bat`（只需运行一次）
+2. 桌面出现"随手"图标
+3. 随时双击图标启动
 
-### Option 2 — One-Click Launch
+### 方式二 — 一键启动
 
-Double-click `start.bat`. The server starts and your browser opens automatically.
+双击 `start.bat`，服务器启动并自动打开浏览器。
 
-### Option 3 — Command Line
+### 方式三 — 命令行
 
 ```bash
 node server.js
 ```
 
-Then open **http://localhost:3000** in your browser.
+然后在浏览器打开 **http://localhost:3000**
 
 ---
 
-## Features
+## 功能
 
-- **Add & organize** tasks in order, drag-drop or arrow buttons to reorder
-- **Pin to top/bottom** for quick access to important items
-- **Double-click to edit** task text inline
-- **Daily auto-reset** — checkmarks clear at midnight, preset habits reappear
-- **Collapse completed** — hide finished tasks with one click
-- **Undo delete** — 3-second toast to recover accidentally deleted tasks
-- **File-based storage** — `todo-data.json` sits next to the HTML, readable & editable
-- **Mobile-friendly** — responsive design with touch drag support
+- **添加与排序** — 拖拽或箭头按钮调整顺序
+- **置顶/置底** — 重要任务一键置顶
+- **双击编辑** — 直接修改任务文字
+- **每日重置** — 勾选标记午夜清零
+- **折叠已完成** — 一键隐藏已完成任务
+- **撤销删除** — 3秒内可恢复误删任务
+- **文件存储** — `todo-data.json` 就在旁边，可读可编辑
+- **移动端友好** — 响应式设计，支持触屏拖拽
 
-## How It Works
+## 工作模式
 
-| Mode | Trigger | Storage |
+| 模式 | 触发方式 | 存储位置 |
 |---|---|---|
-| **Server mode** | `start.bat` or `node server.js` | `todo-data.json` (auto read/write) |
-| **Standalone** | Open `todo.html` directly | `localStorage` (browser only, data lost if cache cleared) |
+| **服务器模式** | `start.bat` 或 `node server.js` | `todo-data.json`（自动读写） |
+| **独立模式** | 直接打开 `todo.html` | `localStorage`（浏览器本地，清缓存会丢失） |
 
-The HTML auto-detects whether the server API is available and switches storage accordingly.
+HTML 会自动检测服务器 API 是否可用，并切换存储方式。
 
-## File Structure
+## 文件结构
 
 ```
-├── start.bat            ← Double-click to launch (Windows)
-├── create-shortcut.bat  ← Creates desktop shortcut (run once)
-├── server.js            ← Node.js server (60 lines, zero deps)
-├── todo.html            ← Frontend (single file)
-├── todo-data.json       ← Data file (auto-created, auto-read/written)
-├── favicon.svg          ← App icon
+├── start.bat            ← 双击启动（Windows）
+├── create-shortcut.bat  ← 创建桌面快捷方式（运行一次）
+├── install-autostart.bat ← 安装开机自启动（运行一次）
+├── server.js            ← Node.js 服务器（零依赖）
+├── todo.html            ← 前端（单文件）
+├── todo-data.json       ← 数据文件（自动创建、自动读写）
+├── favicon.svg          ← 应用图标
 └── README.md
 ```
 
-## Requirements
+## 系统要求
 
-- [Node.js](https://nodejs.org/) v14+ installed and in PATH
-- Windows (`.bat` scripts) or any OS (run `node server.js` manually)
+- [Node.js](https://nodejs.org/) v14+ 已安装并在 PATH 中
+- Windows（`.bat` 脚本）或任意系统（手动运行 `node server.js`）
 
-## Tech
+## 技术
 
-- Single HTML file, zero external dependencies
-- Frosted glass UI with CSS `backdrop-filter`
-- `server.js` — Node.js built-in modules only (`http`, `fs`, `path`)
-- `todo-data.json` — human-readable JSON, easy to edit or version control
-
-## Preset Tasks
-
-Five daily habits auto-add each new day:
-
-1. Review today's schedule
-2. Stay hydrated — drink water
-3. Plan top 3 priorities
-4. Take a short break every hour
-5. Reflect & plan tomorrow before bed
-
-Edit the `PRESET_TASKS` array in the script to customize.
+- 单 HTML 文件，零外部依赖
+- 毛玻璃 UI（CSS `backdrop-filter`）
+- `server.js` — 仅使用 Node.js 内置模块（`http`、`fs`、`path`）
+- `todo-data.json` — 人类可读 JSON，方便编辑或版本控制
 
 ## License
 

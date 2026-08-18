@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-//  Todo List 后端服务
+//  随手 后端服务
 //  用法: node server.js
 //  功能: 提供静态文件服务 + 数据读写 API
 //  依赖: 无（全部使用 Node.js 内置模块）
@@ -175,7 +175,7 @@ const server = http.createServer((req, res) => {
 // ── 启动服务器，监听指定端口 ──
 // 当服务器成功启动后，回调函数会执行，打印启动信息
 server.listen(PORT, () => {
-  console.log(`\n  Todo List running at http://localhost:${PORT}\n`);
+  console.log(`\n  随手 running at http://localhost:${PORT}\n`);
   console.log(`  Data file: ${DATA_FILE}\n`);
   console.log('  Press Ctrl+C to stop.\n');
 });
