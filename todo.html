@@ -912,27 +912,28 @@
         // ══════════════════════════════════════════
 
         function shouldHide(task) {
-          if (!task.done || !task.completedAt) return false;
           var now = new Date();
           switch (task.frequency) {
             case "weekly": {
-              // 今天是指定星期几 → 不隐藏（刚重置）
+              // 不是目标星期几 → 隐藏
+              // 是目标星期几但已勾选 → 隐藏
               var dow = now.getDay();
               var targetDay = task.resetDay !== undefined ? task.resetDay : 1;
-              if (dow === targetDay) return false;
-              // 否则已勾选就隐藏
-              return true;
+              return dow !== targetDay || task.done;
             }
             case "monthly": {
+              // 不是目标日期 → 隐藏
+              // 是目标日期但已勾选 → 隐藏
               var dom = now.getDate();
               var targetDay = task.resetDay || 1;
-              if (dom === targetDay) return false;
-              return true;
+              return dom !== targetDay || task.done;
             }
             case "once":
-              return true; // 一次性：勾选后永远隐藏
+              // 一次性：勾选后隐藏，未勾选时显示
+              return task.done;
             default:
-              return false; // 每日：不隐藏（由 dailyReset 重置）
+              // 每日：永远不隐藏（由 dailyReset 重置）
+              return false;
           }
         }
 
