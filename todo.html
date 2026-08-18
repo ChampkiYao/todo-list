@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todo List</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+  :root {
+    --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    --glass-bg: rgba(255,255,255,.08);
+    --glass-border: rgba(255,255,255,.12);
+    --glass-shadow: rgba(0,0,0,.35);
+    --text-primary: #f0f0f0;
+    --text-secondary: rgba(255,255,255,.55);
+    --accent: #7c5cfc;
+    --accent-hover: #9b82fd;
+    --danger: #ff5c6a;
+    --success: #34d399;
+    --radius: 14px;
+    --transition: .25s cubic-bezier(.4,0,.2,1);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    padding: 24px 12px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 520px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header .date-display {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Input area */
+  .input-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .input-area input {
+    flex: 1;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 15px;
+    color: var(--text-primary);
+    outline: none;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: border-color var(--transition);
+  }
+  .input-area input::placeholder { color: var(--text-secondary); }
+  .input-area input:focus { border-color: var(--accent); }
+
+  .input-area button {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    padding: 0 22px;
+    font-size: 26px;
+    color: #fff;
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .input-area button:hover { background: var(--accent-hover); transform: scale(1.05); }
+  .input-area button:active { transform: scale(.95); }
+
+  /* Task list */
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Task card */
+  .task-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 24px var(--glass-shadow);
+    transition: transform var(--transition), opacity var(--transition), box-shadow var(--transition);
+    cursor: default;
+    position: relative;
+    user-select: none;
+  }
+  .task-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 30px rgba(0,0,0,.45);
+  }
+  .task-card.dragging {
+    opacity: .45;
+    transform: scale(.97);
+  }
+  .task-card.drag-over {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(124,92,252,.35);
+  }
+  .task-card.removing {
+    animation: slideOut .3s ease forwards;
+  }
+  @keyframes slideOut {
+    to { opacity:0; transform: translateX(40px); height:0; padding:0; margin:0; border:0; overflow:hidden; }
+  }
+  .task-card.entering {
+    animation: slideIn .3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity:0; transform: translateY(-8px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* Checkbox */
+  .task-check {
+    position: relative;
+    width: 22px; height: 22px;
+    flex-shrink: 0;
+  }
+  .task-check input {
+    position: absolute;
+    opacity: 0;
+    width: 100%; height: 100%;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .task-check .checkmark {
+    position: absolute;
+    inset: 0;
+    border: 2px solid rgba(255,255,255,.25);
+    border-radius: 6px;
+    transition: all var(--transition);
+  }
+  .task-check input:checked + .checkmark {
+    background: var(--success);
+    border-color: var(--success);
+  }
+  .task-check input:checked + .checkmark::after {
+    content: '';
+    position: absolute;
+    left: 6px; top: 2px;
+    width: 5px; height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .task-text {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.45;
+    word-break: break-word;
+    transition: all var(--transition);
+    cursor: default;
+  }
+  .task-card.done .task-text {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+  }
+
+  /* Inline edit */
+  .task-text.editing {
+    cursor: default;
+  }
+  .edit-input {
+    width: 100%;
+    background: rgba(255,255,255,.08);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 15px;
+    color: var(--text-primary);
+    outline: none;
+    font-family: inherit;
+    line-height: 1.45;
+  }
+
+  /* Action buttons group */
+  .task-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .task-actions button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .task-actions button:hover {
+    color: var(--text-primary);
+    background: rgba(255,255,255,.1);
+  }
+  .task-actions .btn-pin { font-size: 14px; }
+  .task-actions .btn-pin:hover { color: var(--accent-hover); }
+  .task-actions .btn-delete:hover { color: var(--danger); background: rgba(255,92,106,.12); }
+  .task-actions button:disabled {
+    opacity: .2;
+    cursor: default;
+  }
+  .task-actions button:disabled:hover {
+    color: var(--text-secondary);
+    background: none;
+  }
+
+  /* Collapse bar */
+  .collapse-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px;
+    margin-top: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 13px;
+    transition: color var(--transition);
+    user-select: none;
+  }
+  .collapse-bar:hover { color: var(--text-primary); }
+  .collapse-bar .arrow {
+    transition: transform .25s ease;
+    font-size: 10px;
+  }
+  .collapse-bar.expanded .arrow { transform: rotate(180deg); }
+
+  /* Undo toast */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+  }
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(30,30,40,.92);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: 12px 18px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+    color: var(--text-primary);
+    font-size: 14px;
+    pointer-events: auto;
+    animation: toastIn .3s ease;
+    white-space: nowrap;
+  }
+  .toast.hiding {
+    animation: toastOut .3s ease forwards;
+  }
+  .toast-undo {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 5px 14px;
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+    transition: background var(--transition);
+    font-weight: 600;
+  }
+  .toast-undo:hover { background: var(--accent-hover); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(16px); }
+  }
+
+  /* Stats */
+  .stats {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .empty .empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: .5;
+  }
+
+  /* Mobile tweaks */
+  @media (max-width: 480px) {
+    body { padding: 16px 10px 80px; }
+    .input-area input { padding: 12px 14px; font-size: 14px; }
+    .task-card { padding: 10px 12px; }
+    .task-actions button { padding: 4px 8px; font-size: 13px; }
+  }
+
+  /* Preset tag */
+  .preset-tag {
+    font-size: 10px;
+    background: rgba(124,92,252,.25);
+    color: var(--accent-hover);
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>Today's Tasks</h1>
+    <div class="date-display" id="dateDisplay"></div>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="taskInput" placeholder="Add a new task..." maxlength="200" autocomplete="off">
+    <button id="addBtn" title="Add task">+</button>
+  </div>
+
+  <div class="task-list" id="taskList"></div>
+  <div class="collapse-bar" id="collapseBar" style="display:none">
+    <span id="collapseLabel">Hide completed</span>
+    <span class="arrow">&#9660;</span>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Storage keys ──
+  var STORAGE_KEY_TASKS    = 'todo_tasks';
+  var STORAGE_KEY_DATE     = 'todo_date';
+  var STORAGE_KEY_ORDER    = 'todo_order';
+  var STORAGE_KEY_COLLAPSE = 'todo_collapse';
+
+  // ── Preset tasks (re-added each new day) ──
+  var PRESET_TASKS = [
+    'Review today\'s schedule',
+    'Stay hydrated — drink water',
+    'Plan top 3 priorities',
+    'Take a short break every hour',
+    'Reflect & plan tomorrow before bed'
+  ];
+
+  // ── DOM refs ──
+  var taskInput      = document.getElementById('taskInput');
+  var addBtn         = document.getElementById('addBtn');
+  var taskListEl     = document.getElementById('taskList');
+  var dateEl         = document.getElementById('dateDisplay');
+  var statsEl        = document.getElementById('stats');
+  var collapseBar    = document.getElementById('collapseBar');
+  var collapseLabel  = document.getElementById('collapseLabel');
+  var toastContainer = document.getElementById('toastContainer');
+
+  // ── Undo state ──
+  var undoTimer     = null;
+  var pendingDelete = null;
+
+  // ── Collapse state ──
+  var collapsed = loadCollapse();
+
+  // ══════════════════════════════════════════
+  //  Helpers
+  // ══════════════════════════════════════════
+
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
+  function loadTasks() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || []; }
+    catch (e) { return []; }
+  }
+
+  function saveTasks(tasks) {
+    localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+  }
+
+  function loadOrder() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_ORDER)); }
+    catch (e) { return null; }
+  }
+
+  function saveOrder(order) {
+    localStorage.setItem(STORAGE_KEY_ORDER, JSON.stringify(order));
+  }
+
+  function loadSavedDate() {
+    return localStorage.getItem(STORAGE_KEY_DATE);
+  }
+
+  function saveDate(d) {
+    localStorage.setItem(STORAGE_KEY_DATE, d);
+  }
+
+  function loadCollapse() {
+    return localStorage.getItem(STORAGE_KEY_COLLAPSE) === '1';
+  }
+
+  function saveCollapse(v) {
+    localStorage.setItem(STORAGE_KEY_COLLAPSE, v ? '1' : '0');
+  }
+
+  var _idCounter = Date.now();
+  function uid() { return 't_' + (++_idCounter); }
+
+  // Get tasks sorted by saved order
+  function getOrderedTasks() {
+    var tasks = loadTasks();
+    var savedOrder = loadOrder();
+    if (savedOrder) {
+      var orderMap = {};
+      savedOrder.forEach(function(id, i) { orderMap[id] = i; });
+      tasks.sort(function(a, b) {
+        var ia = orderMap[a.id] !== undefined ? orderMap[a.id] : 999999;
+        var ib = orderMap[b.id] !== undefined ? orderMap[b.id] : 999999;
+        return ia - ib;
+      });
+    }
+    return tasks;
+  }
+
+  // ══════════════════════════════════════════
+  //  Daily reset
+  // ══════════════════════════════════════════
+
+  function dailyReset() {
+    var today  = todayKey();
+    var saved  = loadSavedDate();
+    var tasks  = loadTasks();
+
+    if (saved !== today) {
+      // Uncheck all tasks
+      tasks.forEach(function(t) { t.done = false; });
+
+      // Append presets that don't already exist
+      var existingTexts = {};
+      tasks.forEach(function(t) { existingTexts[t.text.toLowerCase()] = true; });
+
+      var newPresets = PRESET_TASKS
+        .filter(function(p) { return !existingTexts[p.toLowerCase()]; })
+        .map(function(p) {
+          return { id: uid(), text: p, done: false, preset: true, created: Date.now() };
+        });
+
+      tasks = tasks.concat(newPresets);
+      saveTasks(tasks);
+      saveDate(today);
+    }
+
+    return tasks;
+  }
+
+  // ══════════════════════════════════════════
+  //  Toast / Undo
+  // ══════════════════════════════════════════
+
+  function showToast(msg, onUndo) {
+    if (undoTimer) { clearTimeout(undoTimer); undoTimer = null; }
+    toastContainer.innerHTML = '';
+
+    var toast = document.createElement('div');
+    toast.className = 'toast';
+
+    var text = document.createElement('span');
+    text.textContent = msg;
+
+    var btn = document.createElement('button');
+    btn.className = 'toast-undo';
+    btn.textContent = 'Undo';
+    btn.addEventListener('click', function() {
+      onUndo();
+      dismissToast(toast);
+    });
+
+    toast.appendChild(text);
+    toast.appendChild(btn);
+    toastContainer.appendChild(toast);
+    undoTimer = setTimeout(function() { dismissToast(toast); }, 3000);
+  }
+
+  function dismissToast(el) {
+    if (!el || !el.parentNode) return;
+    el.classList.add('hiding');
+    setTimeout(function() {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 300);
+    undoTimer = null;
+    pendingDelete = null;
+  }
+
+  // ══════════════════════════════════════════
+  //  Collapse toggle
+  // ══════════════════════════════════════════
+
+  function updateCollapseBar(tasks) {
+    var doneCount = tasks.filter(function(t) { return t.done; }).length;
+    collapseBar.style.display = doneCount > 0 ? '' : 'none';
+    collapseLabel.textContent = collapsed
+      ? 'Show completed (' + doneCount + ')'
+      : 'Hide completed (' + doneCount + ')';
+    collapseBar.classList.toggle('expanded', collapsed);
+  }
+
+  collapseBar.addEventListener('click', function() {
+    collapsed = !collapsed;
+    saveCollapse(collapsed);
+    render();
+  });
+
+  // ══════════════════════════════════════════
+  //  Render
+  // ══════════════════════════════════════════
+
+  function render() {
+    var tasks = dailyReset();
+
+    // Re-read collapsed since dailyReset may have changed tasks
+    var savedOrder = loadOrder();
+    if (savedOrder) {
+      var orderMap = {};
+      savedOrder.forEach(function(id, i) { orderMap[id] = i; });
+      tasks.sort(function(a, b) {
+        var ia = orderMap[a.id] !== undefined ? orderMap[a.id] : 999999;
+        var ib = orderMap[b.id] !== undefined ? orderMap[b.id] : 999999;
+        return ia - ib;
+      });
+    }
+
+    taskListEl.innerHTML = '';
+
+    if (tasks.length === 0) {
+      taskListEl.innerHTML = '<div class="empty"><div class="empty-icon">&#10003;</div>No tasks yet. Add one above!</div>';
+      statsEl.textContent = '';
+      collapseBar.style.display = 'none';
+      return;
+    }
+
+    updateCollapseBar(tasks);
+
+    var visibleCount = 0;
+
+    tasks.forEach(function(task) {
+      // Skip done tasks when collapsed
+      if (collapsed && task.done) return;
+      visibleCount++;
+
+      var card = document.createElement('div');
+      card.className = 'task-card' + (task.done ? ' done' : '');
+      card.dataset.id = task.id;
+      card.draggable = true;
+
+      // Checkbox
+      var checkDiv = document.createElement('label');
+      checkDiv.className = 'task-check';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = task.done;
+      cb.addEventListener('change', (function(id) {
+        return function() { toggleTask(id); };
+      })(task.id));
+      var mark = document.createElement('span');
+      mark.className = 'checkmark';
+      checkDiv.appendChild(cb);
+      checkDiv.appendChild(mark);
+
+      // Text (double-click to edit)
+      var textSpan = document.createElement('span');
+      textSpan.className = 'task-text';
+      textSpan.textContent = task.text;
+      if (task.preset) {
+        var tag = document.createElement('span');
+        tag.className = 'preset-tag';
+        tag.textContent = 'daily';
+        textSpan.appendChild(tag);
+      }
+      textSpan.addEventListener('dblclick', (function(id, ts, c) {
+        return function(e) {
+          e.stopPropagation();
+          startEdit(id, ts, c);
+        };
+      })(task.id, textSpan, card));
+
+      // Actions group
+      var actions = document.createElement('div');
+      actions.className = 'task-actions';
+
+      // Pin to top
+      var pinTop = document.createElement('button');
+      pinTop.className = 'btn-pin';
+      pinTop.innerHTML = '&#8673;';
+      pinTop.title = 'Pin to top';
+      pinTop.addEventListener('click', (function(id) {
+        return function() { pinTask(id, 'top'); };
+      })(task.id));
+
+      // Pin to bottom
+      var pinBot = document.createElement('button');
+      pinBot.className = 'btn-pin';
+      pinBot.innerHTML = '&#8675;';
+      pinBot.title = 'Pin to bottom';
+      pinBot.addEventListener('click', (function(id) {
+        return function() { pinTask(id, 'bottom'); };
+      })(task.id));
+
+      // Move up
+      var upBtn = document.createElement('button');
+      upBtn.innerHTML = '&#9650;';
+      upBtn.title = 'Move up';
+      upBtn.addEventListener('click', (function(id) {
+        return function() { moveTask(id, -1); };
+      })(task.id));
+
+      // Move down
+      var downBtn = document.createElement('button');
+      downBtn.innerHTML = '&#9660;';
+      downBtn.title = 'Move down';
+      downBtn.addEventListener('click', (function(id) {
+        return function() { moveTask(id, 1); };
+      })(task.id));
+
+      // Delete
+      var delBtn = document.createElement('button');
+      delBtn.className = 'btn-delete';
+      delBtn.innerHTML = '&#10005;';
+      delBtn.title = 'Delete task';
+      delBtn.addEventListener('click', (function(id) {
+        return function() { deleteTask(id); };
+      })(task.id));
+
+      actions.appendChild(pinTop);
+      actions.appendChild(pinBot);
+      actions.appendChild(upBtn);
+      actions.appendChild(downBtn);
+      actions.appendChild(delBtn);
+
+      card.appendChild(checkDiv);
+      card.appendChild(textSpan);
+      card.appendChild(actions);
+
+      // Drag events (desktop)
+      card.addEventListener('dragstart', onDragStart);
+      card.addEventListener('dragend', onDragEnd);
+      card.addEventListener('dragover', onDragOver);
+      card.addEventListener('dragenter', onDragEnter);
+      card.addEventListener('dragleave', onDragLeave);
+      card.addEventListener('drop', onDrop);
+
+      // Touch drag
+      var touchState = { card: null };
+      card.addEventListener('touchstart', (function(ts, el) {
+        return function(e) {
+          if (e.target.closest('.task-actions') || e.target.closest('input') || e.target.closest('.edit-input')) return;
+          ts.card = el;
+        };
+      })(touchState, card), { passive: true });
+
+      card.addEventListener('touchmove', (function(ts, el) {
+        return function(e) {
+          if (!ts.card) return;
+          e.preventDefault();
+          var touchY = e.touches[0].clientY;
+          var overEl = document.elementFromPoint(e.touches[0].clientX, touchY);
+          var overCard = overEl ? overEl.closest('.task-card') : null;
+          if (overCard && overCard !== ts.card) {
+            var overRect = overCard.getBoundingClientRect();
+            var overMid = overRect.top + overRect.height / 2;
+            if (touchY < overMid) {
+              taskListEl.insertBefore(ts.card, overCard);
+            } else {
+              taskListEl.insertBefore(ts.card, overCard.nextSibling);
+            }
+          }
+        };
+      })(touchState, card), { passive: false });
+
+      card.addEventListener('touchend', (function(ts) {
+        return function() {
+          if (ts.card) {
+            ts.card = null;
+            persistCurrentOrder();
+            render();
+          }
+        };
+      })(touchState), { passive: true });
+
+      taskListEl.appendChild(card);
+    });
+
+    var done = tasks.filter(function(t) { return t.done; }).length;
+    statsEl.textContent = done + ' / ' + tasks.length + ' completed';
+  }
+
+  // ══════════════════════════════════════════
+  //  Inline edit (double-click)
+  // ══════════════════════════════════════════
+
+  function startEdit(id, textSpan, card) {
+    if (textSpan.querySelector('.edit-input')) return;
+    var tasks = loadTasks();
+    var task = null;
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) { task = tasks[i]; break; }
+    }
+    if (!task) return;
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'edit-input';
+    input.value = task.text;
+    input.maxLength = 200;
+
+    textSpan.classList.add('editing');
+    textSpan.textContent = '';
+    textSpan.appendChild(input);
+    input.focus();
+    input.select();
+
+    var committed = false;
+
+    function commit() {
+      if (committed) return;
+      committed = true;
+      var val = input.value.trim();
+      if (val && val !== task.text) {
+        task.text = val;
+        saveTasks(tasks);
+      }
+      render();
+    }
+
+    function cancel() {
+      committed = true;
+      render();
+    }
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); commit(); }
+      else if (e.key === 'Escape') { cancel(); }
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  // ══════════════════════════════════════════
+  //  CRUD
+  // ══════════════════════════════════════════
+
+  function addTask(text) {
+    text = text.trim();
+    if (!text) return;
+    var tasks = loadTasks();
+    var task = { id: uid(), text: text, done: false, preset: false, created: Date.now() };
+    tasks.push(task);
+    saveTasks(tasks);
+    var order = loadOrder() || tasks.map(function(t) { return t.id; });
+    order.push(task.id);
+    saveOrder(order);
+    render();
+  }
+
+  function toggleTask(id) {
+    var tasks = loadTasks();
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) { tasks[i].done = !tasks[i].done; break; }
+    }
+    saveTasks(tasks);
+    render();
+  }
+
+  function deleteTask(id) {
+    var tasks = loadTasks();
+    var task = null;
+    var idx = -1;
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) {
+        task = tasks[i];
+        idx = i;
+        break;
+      }
+    }
+    if (!task) return;
+
+    var order = loadOrder();
+    var orderIdx = order ? order.indexOf(id) : -1;
+
+    // Store for undo
+    pendingDelete = { task: JSON.parse(JSON.stringify(task)), index: idx, orderIndex: orderIdx };
+
+    // Animate out
+    var card = taskListEl.querySelector('[data-id="' + id + '"]');
+    if (card) card.classList.add('removing');
+
+    // Remove from data
+    var newTasks = [];
+    for (var j = 0; j < tasks.length; j++) {
+      if (tasks[j].id !== id) newTasks.push(tasks[j]);
+    }
+    saveTasks(newTasks);
+
+    if (order) {
+      var newOrder = order.filter(function(oid) { return oid !== id; });
+      saveOrder(newOrder);
+    }
+
+    showToast('Task deleted', function() {
+      if (!pendingDelete) return;
+      // Restore task at original position
+      var restored = loadTasks();
+      var insertAt = Math.min(pendingDelete.index, restored.length);
+      restored.splice(insertAt, 0, pendingDelete.task);
+      saveTasks(restored);
+
+      var restoredOrder = loadOrder() || restored.map(function(t) { return t.id; });
+      var orderInsertAt = Math.min(
+        pendingDelete.orderIndex >= 0 ? pendingDelete.orderIndex : restoredOrder.length,
+        restoredOrder.length
+      );
+      if (pendingDelete.orderIndex >= 0) {
+        restoredOrder.splice(orderInsertAt, 0, pendingDelete.task.id);
+      }
+      saveOrder(restoredOrder);
+      pendingDelete = null;
+      render();
+    });
+
+    setTimeout(function() { render(); }, 280);
+  }
+
+  function moveTask(id, direction) {
+    var tasks = getOrderedTasks();
+    var idx = -1;
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) { idx = i; break; }
+    }
+    if (idx === -1) return;
+    var newIdx = idx + direction;
+    if (newIdx < 0 || newIdx >= tasks.length) return;
+
+    var temp = tasks[idx];
+    tasks[idx] = tasks[newIdx];
+    tasks[newIdx] = temp;
+
+    saveTasks(tasks);
+    saveOrder(tasks.map(function(t) { return t.id; }));
+    render();
+  }
+
+  function pinTask(id, where) {
+    var tasks = getOrderedTasks();
+    var idx = -1;
+    for (var i = 0; i < tasks.length; i++) {
+      if (tasks[i].id === id) { idx = i; break; }
+    }
+    if (idx === -1) return;
+
+    var task = tasks.splice(idx, 1)[0];
+    if (where === 'top') {
+      tasks.unshift(task);
+    } else {
+      tasks.push(task);
+    }
+
+    saveTasks(tasks);
+    saveOrder(tasks.map(function(t) { return t.id; }));
+    render();
+  }
+
+  // ══════════════════════════════════════════
+  //  Persist DOM order after drag
+  // ══════════════════════════════════════════
+
+  function persistCurrentOrder() {
+    var cards = taskListEl.querySelectorAll('.task-card');
+    var order = [];
+    for (var i = 0; i < cards.length; i++) {
+      order.push(cards[i].dataset.id);
+    }
+    saveOrder(order);
+  }
+
+  // ══════════════════════════════════════════
+  //  Drag & Drop
+  // ══════════════════════════════════════════
+
+  var dragSrcEl = null;
+
+  function onDragStart(e) {
+    dragSrcEl = this;
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.dataset.id);
+  }
+
+  function onDragEnd() {
+    this.classList.remove('dragging');
+    var cards = taskListEl.querySelectorAll('.task-card');
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].classList.remove('drag-over');
+    }
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function onDragEnter(e) {
+    e.preventDefault();
+    if (this !== dragSrcEl) this.classList.add('drag-over');
+  }
+
+  function onDragLeave() {
+    this.classList.remove('drag-over');
+  }
+
+  function onDrop(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (dragSrcEl !== this) {
+      var allCards = Array.prototype.slice.call(taskListEl.querySelectorAll('.task-card'));
+      var fromIdx = allCards.indexOf(dragSrcEl);
+      var toIdx   = allCards.indexOf(this);
+      if (fromIdx < toIdx) {
+        taskListEl.insertBefore(dragSrcEl, this.nextSibling);
+      } else {
+        taskListEl.insertBefore(dragSrcEl, this);
+      }
+      persistCurrentOrder();
+      render();
+    }
+    this.classList.remove('drag-over');
+  }
+
+  // ══════════════════════════════════════════
+  //  Date display
+  // ══════════════════════════════════════════
+
+  function showDate() {
+    var d = new Date();
+    var opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    dateEl.textContent = d.toLocaleDateString('en-US', opts);
+  }
+
+  // ══════════════════════════════════════════
+  //  Events
+  // ══════════════════════════════════════════
+
+  addBtn.addEventListener('click', function() {
+    addTask(taskInput.value);
+    taskInput.value = '';
+    taskInput.focus();
+  });
+
+  taskInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      addTask(taskInput.value);
+      taskInput.value = '';
+    }
+  });
+
+  // ══════════════════════════════════════════
+  //  Init
+  // ══════════════════════════════════════════
+
+  showDate();
+  render();
+
+})();
+</script>
+</body>
+</html>
