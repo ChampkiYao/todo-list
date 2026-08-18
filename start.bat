@@ -1,14 +1,10 @@
 @echo off
-chcp 65001 >nul
-title 随手
+title Suishou
 echo.
-echo   Starting 随手...
+echo   Starting Suishou...
 echo.
 
-:: Start server in background
 start /b node "%~dp0server.js"
-
-:: Wait a moment for server to start, then open browser
 timeout /t 1 /nobreak >nul
 start http://localhost:3000
 
