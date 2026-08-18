@@ -2,15 +2,27 @@
 
 A minimalist single-file HTML todo app with frosted glass UI. Data saves to a local JSON file via a tiny Node.js server.
 
-## Quick Start
+## Quick Start (Windows)
+
+### Option 1 — Desktop Shortcut (Recommended)
+
+1. Double-click `create-shortcut.bat` (only needed once)
+2. A "Todo List" icon appears on your Desktop
+3. Double-click the icon anytime to launch
+
+### Option 2 — One-Click Launch
+
+Double-click `start.bat`. The server starts and your browser opens automatically.
+
+### Option 3 — Command Line
 
 ```bash
 node server.js
 ```
 
-Open **http://localhost:3000** in your browser. Done.
+Then open **http://localhost:3000** in your browser.
 
-All tasks, order, and daily state persist in `todo-data.json` next to the HTML file.
+---
 
 ## Features
 
@@ -27,16 +39,33 @@ All tasks, order, and daily state persist in `todo-data.json` next to the HTML f
 
 | Mode | Trigger | Storage |
 |---|---|---|
-| **Server mode** | `node server.js` | `todo-data.json` (auto read/write) |
-| **Standalone** | Open `todo.html` directly | `localStorage` (browser only) |
+| **Server mode** | `start.bat` or `node server.js` | `todo-data.json` (auto read/write) |
+| **Standalone** | Open `todo.html` directly | `localStorage` (browser only, data lost if cache cleared) |
 
 The HTML auto-detects whether the server API is available and switches storage accordingly.
+
+## File Structure
+
+```
+├── start.bat            ← Double-click to launch (Windows)
+├── create-shortcut.bat  ← Creates desktop shortcut (run once)
+├── server.js            ← Node.js server (60 lines, zero deps)
+├── todo.html            ← Frontend (single file)
+├── todo-data.json       ← Data file (auto-created, auto-read/written)
+├── favicon.svg          ← App icon
+└── README.md
+```
+
+## Requirements
+
+- [Node.js](https://nodejs.org/) v14+ installed and in PATH
+- Windows (`.bat` scripts) or any OS (run `node server.js` manually)
 
 ## Tech
 
 - Single HTML file, zero external dependencies
 - Frosted glass UI with CSS `backdrop-filter`
-- `server.js` — 60 lines, Node.js built-in modules only (`http`, `fs`, `path`)
+- `server.js` — Node.js built-in modules only (`http`, `fs`, `path`)
 - `todo-data.json` — human-readable JSON, easy to edit or version control
 
 ## Preset Tasks
