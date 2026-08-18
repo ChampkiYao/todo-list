@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 :: Creates a desktop shortcut for 随手
 set "SCRIPT_DIR=%~dp0"
 set "DESKTOP=%USERPROFILE%\Desktop"

@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 REM ══════════════════════════════════════════
 REM  Windows 启动文件夹快捷方式安装器
 REM  把 start.bat 加入开机自启动

@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title 随手
 echo.
 echo   Starting 随手...
